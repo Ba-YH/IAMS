@@ -10,6 +10,7 @@
 
 
 int utf8len(std::string s);                                         //返回UTF8编码下的字符串长度
+int countChineseCharacters(const std::string& text);                //获取字符串中中文字符的数量
 void inline outputWarning(const std:: string &warning);             //当输入有误时，红色提示错误信息
 void inline outputHint(const std::string &hint);                    //当功能顺利完成时，绿色提示成功信息
 void inline outputHighlight(const std::string &hint);               //系统对用户的高亮提示消息
@@ -22,21 +23,24 @@ std::string to8(std::string value);
 inline int utf8len(std::string s) {
     return utf8::distance(s.begin(), s.end());
 }
+int countChineseCharacters(const std::string& text) {
+    return (text.size()-utf8len(text))/2;
+}
 void inline outputWarning(const std::string &warning) {
-    std::cout << "\033[31m" << warning << "\033[0m";
+    std::cout << "\033[31m" << warning << "\033[0m"<<std::endl;
 }
 void inline outputHint(const std::string &hint) {
-    std::cout << "\033[32m" << hint << "\033[0m";
+    std::cout << "\033[32m" << hint << "\033[0m"<<std::endl;
 }
 
 void inline outputHighlight(const std::string &hint) {
-    std::cout << "\033[33m" << hint << "\033[0m";
+    std::cout << "\033[33m" << hint << "\033[0m"<<std::endl;
 }
-inline std::string transfer(std::string s, int maxLen) {
+inline std::string transfer(std::string s, int maxCount) {
     int codepoint = 12288;
     std::string chineseSpace;
     utf8::utf32to8(&codepoint, &codepoint + 1, std::back_inserter(chineseSpace));
-    while (utf8len(s) < maxLen){
+    while (countChineseCharacters(s) < maxCount){
         s += chineseSpace;
     }
     return s;

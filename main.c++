@@ -21,9 +21,9 @@ using json = nlohmann::json;
 /*----------------------------------------------数据定义区----------------------------------------------------*/
 
 //声明Good类静态成员，主要用于格式化输出
-int Good::maxDescribeLength;
-int Good::maxNameLength;
-int Good::maxCategoryLength;
+int Good::maxDescribeCount;
+int Good::maxNameCount;
+int Good::maxCategoryCount;
 
 
 bool loginStatus = false;                                      //登录状态
@@ -469,28 +469,28 @@ void displayMyGoods(map<int, Good> needToDisplay) {
         outputHint("当前还没有任何物品！");
         return;
     }
-    int maxNameLength = 0;
-    int maxDescribeLength = 0;
-    int maxCategoryLength = 0;
+    auto maxNameCount = 3;
+    auto maxDescribeCount = 2;
+    auto maxCategoryCount = 2;
     for (const auto &[goodId, good]: needToDisplay) {
-        maxNameLength = max(maxNameLength, utf8len(good.getGoodName()));
-        maxDescribeLength = max(maxDescribeLength, utf8len(good.getDescribe()));
-        maxCategoryLength = max(maxCategoryLength, utf8len(good.getCategory()));
+        maxNameCount = max(maxNameCount,countChineseCharacters(good.getGoodName()));
+        maxDescribeCount = max(maxDescribeCount, countChineseCharacters(good.getDescribe()));
+        maxCategoryCount = max(maxCategoryCount, countChineseCharacters(good.getCategory()));
     }
-    Good::maxCategoryLength = maxCategoryLength;
-    Good::maxNameLength = maxNameLength;
-    Good::maxDescribeLength = maxDescribeLength;
+    Good::maxCategoryCount = maxCategoryCount;
+    Good::maxNameCount = maxNameCount;
+    Good::maxDescribeCount = maxDescribeCount;
 
     string line;
     for (int i = 1; i <= 170; i++) line += "-";
     cout << line << "\n";
     cout << left << setw(15) << "ID";
-    cout << left << setw(30) << transfer("物品名", maxNameLength);
+    cout << left << setw(30) << transfer("物品名", maxNameCount);
     cout << left << setw(20) << "损耗程度";
-    cout << left << setw(50) << transfer("描述", maxDescribeLength);
+    cout << left << setw(50) << transfer("描述", maxDescribeCount);
     cout << left << setw(30) << "估价（万元）";
-    cout << left << setw(30) << transfer("种类", maxCategoryLength);
-    cout << left << setw(30) << "上传用户"<<endl;
+    cout << left << setw(30) << transfer("种类", maxCategoryCount);
+    cout << left << setw(20) << "上传用户"<<endl;
     cout << line << "\n";
     int curId = 0;
     for (const auto &[goodId, good]: needToDisplay) {

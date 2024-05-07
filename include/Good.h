@@ -15,9 +15,9 @@ using namespace std;
 class Good {
 public:
     //静态成员变量，为了格式化输出
-    static int maxNameLength;
-    static int maxDescribeLength;
-    static int maxCategoryLength;
+    static int maxNameCount;
+    static int maxDescribeCount;
+    static int maxCategoryCount;
 
     Good() {}
 
