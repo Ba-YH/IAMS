@@ -411,7 +411,7 @@ void userAddGood(string username, Good g) {
     int goodId;
     if (!newGoodId.count(username)) {
         goodId = stoi(to_string(hasher(username)).substr(0, 6));
-    } else goodId = newGoodId[username];
+    } else goodId = newGoodId[username]+1;
     newGoodId[username] = goodId + 1;
     //在添加物品时设置
     g.setId(goodId);
@@ -517,7 +517,7 @@ void deleteGood() {
     }
 
     inputAgain:
-    cout << "所有物品的信息如下：\n";
+    outputHint("\n所有物品的信息如下：\n");
     displayMyGoods(currentGoods);
     int delId = getInput<int>("您当前共有" + to_string(currentGoods.size()) + "个物品，请输入您想删除物品的编号！");
     if (currentGoods.count(delId)) {
@@ -550,7 +550,7 @@ void modifyGood() {
     //继续修改
     modifyAgain:
     currentGoods = tables[currentUsername];
-    cout << "\n所有物品的信息如下：\n";
+    outputHint("\n所有物品的信息如下：\n");
     displayMyGoods(currentGoods);
     int modifyId = getInput<int>("您当前共有" + to_string(currentGoods.size()) + "个物品，请输入您想修改物品的编号：");
     if (!currentGoods.count(modifyId)) {
@@ -1110,9 +1110,9 @@ void loadData() {
                 Good good = goodJson.get<Good>(); //使用反序列化从JSON格式读取对象
                 goods[stoi(goodID)] = good;
                 //更新用户下一个商品ID
-                newGoodId[username] = max(newGoodId[username], stoi(goodID)) + 1;
+                newGoodId[username] = max(newGoodId[username], stoi(goodID));
                 if (username == "admin") {
-                    newGoodId[good.getUploader()] = max(newGoodId[good.getUploader()], stoi(goodID)) + 1;
+                    newGoodId[good.getUploader()] = max(newGoodId[good.getUploader()], stoi(goodID));
                 }
             }
             tables[username] = goods;
@@ -1227,6 +1227,7 @@ void exitTheSystem() {
 int main(void) {
     //先从JSON数据文件加载信息
     loadData();
+    cout<<newGoodId["zhangsan"];
     selectMainMenu();
     return 0;
 }
