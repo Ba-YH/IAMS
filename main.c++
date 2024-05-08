@@ -170,7 +170,7 @@ void selectUserMenu() {
     int operation;
     while (true) {
         displayUserMenu();
-        operation = getInput<int>("请选择要输入的编号：");
+        operation = getInput<int>("请选择要执行的功能编号[1~4之间的整数]：");
         switch (operation) {
             case 1:
                 login();
@@ -184,7 +184,7 @@ void selectUserMenu() {
             case 4:
                 return;
             default:
-                outputWarning("输入错误，请重新输入！");
+                outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
         }
         //saveUsers();
     }
@@ -335,7 +335,7 @@ void selectGoodMenu() {
             case 8:
                 return;
             default:
-                outputWarning("输入错误，请重新输入！\n");
+                outputWarning("输入错误，请检查输入是否是[1~8]之间的整数！\n");
         }
         //saveGoods();
     }
@@ -378,7 +378,7 @@ void selGoodMenuWhitAdmin() {
             case 4:
                 return;
             default:
-                outputWarning("输入错误，请重新输入！\n");
+                outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
         }
         //saveGoods();
     }
@@ -812,7 +812,7 @@ void selectRecordMenu() {
             case 3:
                 return;
             default:
-                outputWarning("输入错误，请重新输入！");
+                outputWarning("输入错误，请检查输入是否是[1~3]之间的整数！");
         }
         //saveRecords();
     }
@@ -1198,7 +1198,7 @@ void selectMainMenu() {
                 exitTheSystem();
                 break;
             default:
-                outputWarning("输入有误，请检重新输入！");
+                outputWarning("输入有误，请检查输入是否是[1~4]之间的整数！");
         }
     }
 }
