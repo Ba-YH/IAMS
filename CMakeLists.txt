@@ -5,17 +5,13 @@ project(itemAuctionManagementSystem)
 
 set(CMAKE_CXX_STANDARD 17)
 
-#忽略警告信息
-#如果不是中文的JSON，简易开启
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fexec-charset=gbk")
 
 #设置源文件
-set(SOURCE_FILES main.c++)
-set(OPENSSL_USE_STATIC_LIBS TRUE)
-#使用OpenSSL库
+set(SOURCE_FILE main.c++)
+#设置OPENSSL根目录路径
+set(${OPENSSL_ROOT_DIR} D:/Code/libarys/openssl)
+#寻找OPENSSL
 find_package(OpenSSL REQUIRED)
-#设置由源文件生成的可执行文件名称
-add_executable(main ${SOURCE_FILES})
-#链接OpenSSL库，注意与find_package的大小写相同
+add_executable(main ${SOURCE_FILE})
+# 链接 OpenSSL 库
 target_link_libraries(main OpenSSL::Crypto)
-

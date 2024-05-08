@@ -490,7 +490,7 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     cout << left << setw(20) << "损耗程度";
     cout << left << setw(50) << transfer("描述", maxDescribeCount);
     cout << left << setw(30) << "估价（万元）";
-    cout << left << setw(30) << transfer("种类", maxCategoryCount);
+    cout << left << setw(20) << transfer("种类", maxCategoryCount);
     cout << left << setw(20) << "上传用户" << endl;
     cout << line << "\n";
     int curId = 0;
@@ -1227,7 +1227,6 @@ void exitTheSystem() {
 int main(void) {
     //先从JSON数据文件加载信息
     loadData();
-    cout<<newGoodId["zhangsan"];
     selectMainMenu();
     return 0;
 }
