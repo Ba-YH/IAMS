@@ -215,15 +215,17 @@ void login() {
     //判断是否需要切换账号
     string username, password;
     if (loginStatus) {
-        char switchAccounts = getInput<char>("当前账号" + currentUsername + "已登录！是否需要切换账号？(y/n)", 1);
-        if (switchAccounts != 'y') return;
+        string switchAccounts = getInput<string>("当前账号" + currentUsername + "已登录！是否需要切换账号？(y/n)", 1);
+        if (switchAccounts == "y" || switchAccounts.empty());
+        else return;
     }
     logInAgain:
     username = getInput<string>("请输入用户名：");
     string prompt = append("请输入密", 1) + "码：";
     if (!users.count(username)) {
-        char registerOrNot = getInput<char>("用户名未找到！是否直接使用此用户名进行注册？(y/n)", 1);
-        if (registerOrNot == 'y') {
+        //可以直接回车
+        string registerOrNot = getInput<string>("用户名未找到！是否直接使用此用户名进行注册？(y/n)", 1);
+        if (registerOrNot == "y" || registerOrNot.empty()) {
             password = getInput<string>(prompt);
             //添加用户,计算新的用户ID->添加到用户ID表->添加到用户表
             User addUser(username, password);
@@ -440,8 +442,8 @@ void addGood() {
     outputHint("物品信息添加成功！");
 
     while (true) {
-        char continueOrNot = getInput<char>("是否需要继续添加物品？(y/n)");
-        if (continueOrNot == 'y') {
+        string continueOrNot = getInput<string>("是否需要继续添加物品？(y/n)");
+        if (continueOrNot == "y" || continueOrNot.empty()) {
             addGood();
         } else {
             break;
@@ -527,8 +529,8 @@ void deleteGood() {
     }
 
     while (true) {
-        char continueOrNot = getInput<char>("是否需要继续删除物品？(y/n)");
-        if (continueOrNot == 'y') {
+        string continueOrNot = getInput<string>("是否需要继续删除物品？(y/n)");
+        if (continueOrNot == "y" || continueOrNot.empty()) {
             goto delAgain;
         } else {
             break;
@@ -585,7 +587,16 @@ void modifyGood() {
         selGood.setCategory(categories[stoi(selId) - 1]);
     }
     tables[currentUsername][modifyId] = selGood;
-    outputHint("编号为［" + to_string(modifyId) + "］的物品已完成修改！");
+    outputHint("编号为［" + to_string(modifyId) + "］的物品已完成修改！\n");
+
+    while (true) {
+        string continueOrNot = getInput<string>("是否需要继续修改物品？(y/n)");
+        if (continueOrNot == "y" || continueOrNot.empty()) {
+            goto modifyAgain;
+        } else {
+            break;
+        }
+    }
 }
 
 void getGoodById(map<int, Good> goods) {
@@ -726,15 +737,15 @@ void uploadGood() {
         Good curGood = currentGoods[delId];
         tables[currentUsername].erase(delId);
         userAddGood("admin", curGood);
-        outputHint("已成功将编号为［" + to_string(delId) + "］的物品上传到拍卖系统！");
+        outputHint("已成功将编号为［" + to_string(delId) + "］的物品上传到拍卖系统！\n");
     } else {
         outputWarning("输入有误，请检查您的输入！\n");
         goto inputAgain;
     }
 
     while (true) {
-        char continueOrNot = getInput<char>("是否需要继续上传物品？(y/n)");
-        if (continueOrNot == 'y') {
+        string continueOrNot = getInput<string>("是否需要继续上传物品？(y/n)");
+        if (continueOrNot == "y" || continueOrNot.empty()) {
             goto uploadAgain;
         } else {
             break;
@@ -773,7 +784,7 @@ void batchAddGood() {
     ifstream inputfile(fileName);
     if (!inputfile.is_open()) {
         outputWarning("文件打开失败，请检查文件路径是否正确并重新输入！\n");
-        return batchAddGood();
+        batchAddGood();
     }
     //文件读取过程使用异常检测
     try {
@@ -789,7 +800,7 @@ void batchAddGood() {
     } catch (json::parse_error &ex) {
         //文件读取异常
         outputWarning("文件内容错误，请检查文件内容是否正确！\n");
-        return batchAddGood();
+        return;
     }
 }
 
