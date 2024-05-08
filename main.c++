@@ -282,7 +282,7 @@ void registerUser() {
 
 void modifyPassword() {
     if (loginStatus == false) {
-        outputWarning("您还未登录~");
+        outputWarning("您还没有登录！");
         return;
     }
     inputAgain:
@@ -295,7 +295,7 @@ void modifyPassword() {
     string newpassword2 = getInput<string>("请再次确认密码：");
     if (newpassword2 == newpassword2) {
         users[currentUsername].password = newpassword;
-        cout << "修改成功！";
+        outputHint("修改成功！");
     } else {
         outputWarning("两次输入密码不一致，请重新输入！\n");
         modifyPassword();
@@ -439,7 +439,6 @@ void addGood() {
     userAddGood(currentUsername, good);
     outputHint("物品信息添加成功！");
 
-    //询问是否继续
     while (true) {
         char continueOrNot = getInput<char>("是否需要继续添加物品？(y/n)");
         if (continueOrNot == 'y') {
@@ -473,7 +472,7 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     auto maxDescribeCount = 2;
     auto maxCategoryCount = 2;
     for (const auto &[goodId, good]: needToDisplay) {
-        maxNameCount = max(maxNameCount,countChineseCharacters(good.getGoodName()));
+        maxNameCount = max(maxNameCount, countChineseCharacters(good.getGoodName()));
         maxDescribeCount = max(maxDescribeCount, countChineseCharacters(good.getDescribe()));
         maxCategoryCount = max(maxCategoryCount, countChineseCharacters(good.getCategory()));
     }
@@ -490,7 +489,7 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     cout << left << setw(50) << transfer("描述", maxDescribeCount);
     cout << left << setw(30) << "估价（万元）";
     cout << left << setw(30) << transfer("种类", maxCategoryCount);
-    cout << left << setw(20) << "上传用户"<<endl;
+    cout << left << setw(20) << "上传用户" << endl;
     cout << line << "\n";
     int curId = 0;
     for (const auto &[goodId, good]: needToDisplay) {
@@ -708,7 +707,7 @@ void uploadGood() {
     map<int, Good> currentGoods = tables[currentUsername];
     //判断是否有物品
     if (currentGoods.size() == 0) {
-        outputWarning("当前没有物品可以上传，请先添加物品！");
+        outputWarning("当前没有物品可以上传，请先添加物品！\n");
         return;
     }
 
@@ -716,7 +715,7 @@ void uploadGood() {
     uploadAgain:
     currentGoods = tables[currentUsername];
     if (currentGoods.size() == 0) {
-        outputWarning("您已上传完全部物品！");
+        outputWarning("您已上传完全部物品！\n");
         return;
     }
 
@@ -786,7 +785,7 @@ void batchAddGood() {
             userAddGood(currentUsername, g);
         }
         inputfile.close();
-        cout << "批量导入成功！";
+        outputHint("批量导入成功！");
     } catch (json::parse_error &ex) {
         //文件读取异常
         outputWarning("文件内容错误，请检查文件内容是否正确！\n");
@@ -1007,8 +1006,8 @@ void displayRecords() {
         if (username != "admin")
             cnt[username] = 0;
     }
-    if(records.size()==0){
-        outputHint("当前还没有用户交易记录");
+    if (records.size() == 0) {
+        outputHint("当前还没有用户交易记录！");
         goto next;
     }
     //以三线表的形式展示交易记录
@@ -1169,8 +1168,11 @@ void displayMainMenu() {
         cout << space << "未登录\n\n";
     }
     cout << right << setw(30) << "1. 账号管理" << right << setw(30) << "2. 物品管理\n";
-    if (currentUsername != "admin") cout << right << setw(30) << "3. 交易记录";
-    else cout << right << setw(30) << "3. 交易管理";
+    if (currentUsername != "admin") {
+        cout << right << setw(30) << "3. 交易记录";
+    } else {
+        cout << right << setw(30) << "3. 交易管理";
+    }
     cout << right << setw(30) << "4. 退出系统\n";
     string line;
     for (int i = 1; i <= title.size() - 13; i++) line += '-';
@@ -1207,11 +1209,11 @@ void exitTheSystem() {
     saveUsers();
     saveGoods();
     saveRecords();
-    cout << "正在退出系统,欢迎您下次使用！";
+    outputHint("正在退出系统，欢迎您下次使用！");
     exit(0);
 }
 
-int main(void){
+int main(void) {
     //先从JSON数据文件加载信息
     loadData();
     selectMainMenu();
