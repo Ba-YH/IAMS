@@ -6,7 +6,7 @@
 #define ITEMAUCTIONMANAGER_RECORDS_H
 #include "bits/stdc++.h"
 #include "nlohmann/json.hpp"
-#include "../util/output.h"
+#include "../util/Output.h"
 
 using namespace std;
 

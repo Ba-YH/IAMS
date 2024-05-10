@@ -7,7 +7,7 @@
 
 #include "bits/stdc++.h"
 #include "nlohmann/json.hpp"
-#include "../util/output.h"
+#include "../util/Output.h"
 using namespace std;
 
 const vector<string> categories={"艺术品", "古董与收藏品", "房地产", "文娱和体育纪念品", "奢侈品", "金银珠宝","虚拟产品"};

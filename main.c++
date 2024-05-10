@@ -5,8 +5,8 @@
 #include "src/User.c++"
 #include "src/Record.c++"
 #include "bits/stdc++.h"
-#include "util/output.h"
-#include "util/AESEncryptor.h"
+#include "util/Output.h"
+#include "util/Encryptor.h"
 
 //忽略警告
 #pragma clang diagnostic pop
@@ -147,7 +147,7 @@ string secureInput(const std::string prompt) {
             for (int i = 1; i <= input.size(); i++) {
                 cout << "\b \b";
             }
-            cout << aes_encrypt(input) << "\n";
+            cout << my_encrypt(input) << "\n";
             break;
         }
         if (c == '\b' || c == 127) {
@@ -1192,7 +1192,7 @@ void displayMainMenu() {
 }
 
 void systemIntroduction(){
-    
+
 }
 void selectMainMenu() {
     int operation;

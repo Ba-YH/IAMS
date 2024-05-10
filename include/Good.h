@@ -8,7 +8,7 @@
 #include "utf8.h"
 #include "bits/stdc++.h"
 #include "nlohmann/json.hpp"
-#include "../util/output.h"
+#include "../util/Output.h"
 
 using namespace std;
 
