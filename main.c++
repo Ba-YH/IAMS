@@ -93,10 +93,10 @@ void saveGoods();                                              //保存商品数
 void saveRecords();                                            //保存记录数据
 
 /*首页*/
-void displayMainMenu();                                       //展示功能面板
+void systemIntroduction();                                     //系统介绍
+void displayMainMenu();                                        //展示功能面板
 void selectMainMenu();                                         //主菜单项的选择与调用
 void exitTheSystem();                                          //退出系统
-
 
 /*------------------------------------------------辅助功能函数区--------------------------------------------*/
 
@@ -1178,18 +1178,22 @@ void displayMainMenu() {
         for (int i = 1; i <= 57 - utf8len(describe); i++) space += " ";
         cout << space << "未登录\n\n";
     }
-    cout << right << setw(30) << "1. 账号管理" << right << setw(30) << "2. 物品管理\n";
+    cout << right << setw(30) << "1. 用户管理" << right << setw(30) << "2. 物品管理\n";
     if (currentUsername != "admin") {
         cout << right << setw(30) << "3. 交易记录";
     } else {
         cout << right << setw(30) << "3. 交易管理";
     }
-    cout << right << setw(30) << "4. 退出系统\n";
+    cout << right << setw(30) << "4. 系统介绍\n";
+    cout << right << setw(30) <<"5. 退出系统"<<endl;//最后输入结束采用endl 前面换行用\n
     string line;
     for (int i = 1; i <= title.size() - 13; i++) line += '-';
     cout << line << endl;
 }
 
+void systemIntroduction(){
+    
+}
 void selectMainMenu() {
     int operation;
     while (true) {
@@ -1208,6 +1212,9 @@ void selectMainMenu() {
                 else displayRecords();
                 break;
             case 4:
+                systemIntroduction();
+                break;
+            case 5:
                 exitTheSystem();
                 break;
             default:
