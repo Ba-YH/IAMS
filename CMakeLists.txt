@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 #设置源文件
 set(SOURCE_FILE main.c++)
 #设置OPENSSL根目录路径
-set(${OPENSSL_ROOT_DIR} D:/Code/libarys/openssl)
+set(${OPENSSL_ROOT_DIR} D:/Code/Libs/openssl)
 #寻找OPENSSL
 find_package(OpenSSL REQUIRED)
 add_executable(main ${SOURCE_FILE})
