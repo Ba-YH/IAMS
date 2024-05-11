@@ -31,7 +31,7 @@ string currentUsername;                                        //当前用户名
 vector<Record> records;                                        //交易记录
 map<string, User> users;                                       //用户数据表
 map<string, map<int, Good>> tables;                            //用户物品表
-map<string, int> newGoodId;                                     //生成用户下一件物品的ID
+map<string, int> newGoodId;                                    //生成用户下一件物品的ID
 hash<string> hasher;                                           //哈希函数
 string goodsfilename = "../data/goods.json";                   //拍卖品数据文件位置
 string usersfilename = "../data/users.json";                   //用户数据文件位置
@@ -411,7 +411,7 @@ void userAddGood(string username, Good g) {
     int goodId;
     if (!newGoodId.count(username)) {
         goodId = stoi(to_string(hasher(username)).substr(0, 6));
-    } else goodId = newGoodId[username]+1;
+    } else goodId = newGoodId[username] + 1;
     newGoodId[username] = goodId + 1;
     //在添加物品时设置
     g.setId(goodId);
@@ -1184,16 +1184,46 @@ void displayMainMenu() {
     } else {
         cout << right << setw(30) << "3. 交易管理";
     }
-    cout << right << setw(30) << "4. 系统介绍\n";
-    cout << right << setw(30) <<"5. 退出系统"<<endl;//最后输入结束采用endl 前面换行用\n
+    cout << right << setw(30) << "4. 关于系统\n";
+    cout << right << setw(30) << "5. 退出系统" << endl;//最后输入结束采用endl 前面换行用\n
     string line;
     for (int i = 1; i <= title.size() - 13; i++) line += '-';
     cout << line << endl;
 }
 
-void systemIntroduction(){
-
+void systemIntroduction() {
+    // @formatter:off  关闭格式化
+    cout<<"           _____                    _____                    _____                    _____                 \n";
+    cout<<"          /\\    \\                  /\\    \\                  /\\    \\                  /\\    \\                \n";
+    cout<<"         /::\\    \\                /::\\    \\                /::\\____\\                /::\\    \\               \n";
+    cout<<"         \\:::\\    \\              /::::\\    \\              /::::|   |               /::::\\    \\              \n";
+    cout<<"          \\:::\\    \\            /::::::\\    \\            /:::::|   |              /::::::\\    \\             \n";
+    cout<<"           \\:::\\    \\          /:::/\\:::\\    \\          /::::::|   |             /:::/\\:::\\    \\            \n";
+    cout<<"            \\:::\\    \\        /:::/__\\:::\\    \\        /:::/|::|   |            /:::/__\\:::\\    \\           \n";
+    cout<<"            /::::\\    \\      /::::\\   \\:::\\    \\      /:::/ |::|   |            \\:::\\   \\:::\\    \\          \n";
+    cout<<"   ____    /::::::\\    \\    /::::::\\   \\:::\\    \\    /:::/  |::|___|______    ___\\:::\\   \\:::\\    \\         \n";
+    cout<<"  /\\   \\  /:::/\\:::\\    \\  /:::/\\:::\\   \\:::\\    \\  /:::/   |::::::::\\    \\  /\\   \\:::\\   \\:::\\    \\        \n";
+    cout<<" /::\\   \\/:::/  \\:::\\____\\/:::/  \\:::\\   \\:::\\____\\/:::/    |:::::::::\\____\\/::\\   \\:::\\   \\:::\\____\\       \n";
+    cout<<" \\:::\\  /:::/    \\::/    /\\::/    \\:::\\  /:::/    /\\::/    / ~~~~~/:::/    /\\:::\\   \\:::\\   \\::/    /       \n";
+    cout<<"  \\:::\\/:::/    / \\/____/  \\/____/ \\:::\\/:::/    /  \\/____/      /:::/    /  \\:::\\   \\:::\\   \\/____/        \n";
+    cout<<"   \\::::::/    /                    \\::::::/    /               /:::/    /    \\:::\\   \\:::\\    \\            \n";
+    cout<<"    \\::::/____/                      \\::::/    /               /:::/    /      \\:::\\   \\:::\\____\\           \n";
+    cout<<"     \\:::\\    \\                      /:::/    /               /:::/    /        \\:::\\  /:::/    /           \n";
+    cout<<"      \\:::\\    \\                    /:::/    /               /:::/    /          \\:::\\/:::/    /            \n";
+    cout<<"       \\:::\\    \\                  /:::/    /               /:::/    /            \\::::::/    /             \n";
+    cout<<"        \\:::\\____\\                /:::/    /               /:::/    /              \\::::/    /              \n";
+    cout<<"         \\::/    /                \\::/    /                \\::/    /                \\::/    /               \n";
+    cout<<"          \\/____/                  \\/____/                  \\/____/                  \\/____/                \n";
+    cout<<"\n\n";
+    cout<<"内部版本号 #IAMS_1.0,  2024年5月12日构建\n";
+    cout<<"Designer: Ba Yun-Hao  版权所有 ©2024-2099    \n";
+    cout<<"本项目已在GitHub上开开源：";
+    cout<<"\033[33m"<<"https://github.com/Ba-YH/IAMS\n"<<"\033[0m";
+    cout<<"如果你对项目使用有任何疑问，请在GitHub中查看!\n";
+    cout<<"如果你发现该项目的任何问题或是需求新的功能，欢迎您在issues提出!\n";
+    // @formatter:on   开启格式化
 }
+
 void selectMainMenu() {
     int operation;
     while (true) {
