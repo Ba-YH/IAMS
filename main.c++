@@ -321,14 +321,14 @@ void usersList(){
 }
 void banningUser(){
     string shortline;
-    for(int i=1;i<=55;i++) shortline+='-';
+    for(int i=1;i<=53;i++) shortline+='-';
     int uid=0;
     map<string,User> userId;
     //先展示用户列表
     cout<<"\n\n";
-    cout<<shortline<<"\n|";
+    cout<<shortline<<"--\n|";
     cout<<left<<setw(30)<<"用户编号"<<left<<setw(30)<<"用户名"<<"|\n";
-    cout<<shortline<<"\n";
+    cout<<"|"<<shortline<<"|\n";
     for(auto [username,user] : users){
         if(username=="admin") continue;
         string id=int2str(++uid,6);
@@ -338,7 +338,7 @@ void banningUser(){
         cout<<left<<setw(30)<<append(user.username,3);
         cout<<"|\n";
     }
-    cout<<shortline<<"\n";
+    cout<<shortline<<"--\n";
 
     string selectUserId= getInput<string>("请输入要封禁的用户编号：");
     if(userId.count(selectUserId)){
@@ -527,22 +527,24 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     Good::maxDescribeCount = maxDescribeCount;
 
     string line;
-    for (int i = 1; i <= 170; i++) line += "-";
-    cout << line << "\n";
+    for (int i = 1; i <= 151; i++) line += "-";
+    cout << line << "--\n|";
     cout << left << setw(15) << "ID";
     cout << left << setw(30) << transfer("物品名", maxNameCount);
     cout << left << setw(20) << "损耗程度";
     cout << left << setw(50) << transfer("描述", maxDescribeCount);
     cout << left << setw(30) << "估价（万元）";
-    cout << left << setw(20) << transfer("种类", maxCategoryCount);
-    cout << left << setw(20) << "上传用户" << endl;
-    cout << line << "\n";
+    cout << left << setw(30) << transfer("种类", maxCategoryCount);
+    cout << left << setw(20) << "上传用户" << "|\n";
+    cout <<"|"<<line << "|\n";
     int curId = 0;
     for (const auto &[goodId, good]: needToDisplay) {
+        cout << "|";
         cout << left << setw(15) << goodId;
         cout << good;
+        cout <<"|\n";
     }
-    cout << line << "\n";
+    cout << line << "--\n";
 }
 
 void deleteGood() {

@@ -47,9 +47,8 @@ std::ostream &operator<<(ostream &os, const Good &g) {
     os << setw(20) << append(double2str(g.degreeOfImpairment, 2), 4);
     os << setw(50) << transfer(g.describe, Good::maxDescribeCount);
     os << setw(30) << append(double2str(g.appraisal, 4), 6);
-    os << setw(20) << transfer(g.category, Good::maxCategoryCount);
+    os << setw(30) << transfer(g.category, Good::maxCategoryCount);
     os << setw(20) << append(g.uploader, 4);
-    os << endl;
     return os;
 }
 
