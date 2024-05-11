@@ -95,6 +95,7 @@ std::string my_encrypt(const std::string &plain_text) {
 
 std::string my_decrypt(const std::string &cipher_text) {
     std::string decrypted_text = aes_decrypt(base64_decode(cipher_text));
+    return decrypted_text;
 }
 
 #endif //ITEMAUCTIONMANAGER_AESENCRYPTOR_H
