@@ -17,7 +17,7 @@ public:
     ~User(){}
     // 无参构造函数
     User(const string &username, const string &password) :
-        username(username), password(password), sucessRate(0.00), countOfSessions(0),countOfSuccesses(0){
+        username(username), password(password),isAvailable(true), sucessRate(0.00), countOfSessions(0),countOfSuccesses(0){
         for(auto &c : categories){
             difCategoryCnt[c] = 0;
         }
@@ -44,5 +44,6 @@ public:
     int countOfSuccesses{};
     map<string,int> difCategoryCnt;
     map<string,double> difCategorySucessRate;
+    bool isAvailable;  //默认可用
 };
 #endif //ITEMAUCTIONMANAGER_USER_H

@@ -51,7 +51,8 @@ void displayUserMenu();                                        //展示用户功
 void login();                                                  //登录账号
 void registerUser();                                           //注册账号
 void modifyPassword();                                         //修改密码
-
+void banningUser();
+void usersList();
 
 /*物品管理*/
 void selectGoodMenu();                                         //拍卖品菜单项的选择与调用
@@ -171,6 +172,10 @@ void selectUserMenu() {
     while (true) {
         displayUserMenu();
         operation = getInput<int>("请选择要执行的功能编号[1~4之间的整数]：");
+        if(currentUsername!="admin" and (operation<1 or operation>4)){
+            outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！");
+            continue;
+        }
         switch (operation) {
             case 1:
                 login();
@@ -182,9 +187,16 @@ void selectUserMenu() {
                 modifyPassword();
                 break;
             case 4:
+                if(currentUsername=="admin") banningUser();
+                else return;
+                break;
+            case 5:
+                usersList();
+                break;
+            case 6:
                 return;
             default:
-                outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
+                outputWarning("输入错误，请检查输入是否是[1~6]之间的整数！\n");
         }
         //saveUsers();
     }
@@ -207,7 +219,12 @@ void displayUserMenu() {
     else
         cout << right << setw(30) << "1. 切换账号";
     cout << right << setw(30) << "2. 用户注册\n";
-    cout << right << setw(30) << "3. 修改密码" << right << setw(30) << "4. 返回首页\n";
+    if(currentUsername!="admin") {
+        cout << right << setw(30) << "3. 修改密码" << right << setw(30) << "4. 返回首页\n";
+    }else{
+        cout<<right<<setw(30)<<"3. 修改密码"<<right<<setw(30)<<"4. 封禁用户\n";
+        cout<<right<<setw(30)<<"5. 用户信息"<<right<<setw(30)<<"6. 返回首页\n";
+    }
     cout << "--------------------------------------------------------------------\n";
 }
 
@@ -304,6 +321,12 @@ void modifyPassword() {
     }
 }
 
+void usersList(){
+    //展示用户信息
+}
+void banningUser(){
+    //先输出用户列表的
+}
 /*------------------------------------------------商品管理区-----------------------------------------------*/
 void selectGoodMenu() {
     loginOrNot();
