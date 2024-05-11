@@ -325,7 +325,33 @@ void usersList(){
     //展示用户信息
 }
 void banningUser(){
-    //先输出用户列表的
+    string shortline;
+    for(int i=1;i<=55;i++) shortline+='-';
+    int uid=0;
+    map<string,User> userId;
+    //先展示用户列表
+    cout<<"\n\n";
+    cout<<shortline<<"\n|";
+    cout<<left<<setw(30)<<"用户编号"<<left<<setw(30)<<"用户名"<<"|\n";
+    cout<<shortline<<"\n";
+    for(auto [username,user] : users){
+        if(username=="admin") continue;
+        string id=int2str(++uid,6);
+        userId[id]=user;
+        cout<<"|";
+        cout<<left<<setw(30)<<append(id,4);
+        cout<<left<<setw(30)<<append(user.username,3);
+        cout<<"|\n";
+    }
+    cout<<shortline<<"\n";
+
+    string selectUserId= getInput<string>("请输入要封禁的用户编号：");
+    if(userId.count(selectUserId)){
+        users[userId[selectUserId].username].isAvailable=false;
+        outputHint("编号为［"+selectUserId+"]的用户已封禁");
+    }else{
+        outputWarning("没有编号为［"+selectUserId+"］的用户\n");
+    }
 }
 /*------------------------------------------------商品管理区-----------------------------------------------*/
 void selectGoodMenu() {
