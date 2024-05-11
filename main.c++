@@ -8,11 +8,6 @@
 #include "util/Output.h"
 #include "util/Encryptor.h"
 
-//忽略警告
-#pragma clang diagnostic pop
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wc++17-extensions"
-
 using namespace std;
 using json = nlohmann::json;
 
