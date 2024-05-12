@@ -1,4 +1,3 @@
-//@formatter:off
 #include "conio.h"
 #include <locale>
 #include <codecvt>
@@ -526,11 +525,11 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     Good::maxCategoryCount = maxCategoryCount;
     Good::maxNameCount = maxNameCount;
     Good::maxDescribeCount = maxDescribeCount;
-
+    int sumCount=maxCategoryCount+maxNameCount+maxDescribeCount;
     string line;
-    for (int i = 1; i <= 151; i++) line += "-";
+    for (int i = 1; i <= 200-sumCount-4-4-6-4; i++) line += "-";
     cout << line << "--\n|";
-    cout << left << setw(15) << "ID";
+    cout << left << setw(20) << "物品编号";
     cout << left << setw(30) << transfer("物品名", maxNameCount);
     cout << left << setw(20) << "损耗程度";
     cout << left << setw(50) << transfer("描述", maxDescribeCount);
@@ -541,7 +540,7 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     int curId = 0;
     for (const auto &[goodId, good]: needToDisplay) {
         cout << "|";
-        cout << left << setw(15) << goodId;
+        cout << left << setw(20) <<append(to_string(goodId),4);
         cout << good;
         cout <<"|\n";
     }
