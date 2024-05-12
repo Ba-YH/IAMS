@@ -352,12 +352,18 @@ void banningUser() {
         string id = int2str(++uid, 6);
         userId[id] = user;
         cout << "|";
-        cout << left << setw(30) << append(id, 4);
-        cout << left << setw(30) << append(user.username, 3);
+        std::ostringstream oss;
+        oss << left << setw(30) << append(id, 4);
+        oss << left << setw(30) << append(user.username, 3);
         string val;
         if (user.isAvailable == true) val = "可用";
         else val = "封禁";
-        cout << left << setw(30) << append(val, 2);
+        oss << left << setw(30) << append(val, 2);
+        if (val == "可用") {
+            cout << "\033[32m" << oss.str() << "\033[0m";
+        } else {
+            cout << "\033[31m" << oss.str() << "\033[0m";
+        }
         cout << "|\n";
     }
     cout << shortline << "--\n";
