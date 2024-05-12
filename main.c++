@@ -318,7 +318,22 @@ void modifyPassword() {
 }
 
 void usersList() {
-    //TODO 三线表的信息展示输出
+    outputHint("\n所有用户信息如下：");
+    string line;
+    for (int i = 1; i <= 90 - 11; i++) line += '-';
+    cout << line << "--\n";
+    cout << "|";
+    cout << left << setw(30) << "用户名" << left << setw(30) << "密码" << left << setw(30) << "参与拍卖次数";
+    cout << "|\n";
+    cout << "|" << line << "|\n";
+    for (auto [username, user]: users) {
+        cout << "|";
+        cout << left << setw(30) << append(username, 3);
+        cout << left << setw(30) << append(user.password, 2);
+        cout << left << setw(30) << append(to_string(user.countOfSessions), 6);
+        cout << "|\n";
+    }
+    cout << line << "--\n";
 }
 
 void banningUser() {
@@ -340,7 +355,7 @@ void banningUser() {
         cout << left << setw(30) << append(id, 4);
         cout << left << setw(30) << append(user.username, 3);
         string val;
-        if (user.isAvailable== true) val = "可用";
+        if (user.isAvailable == true) val = "可用";
         else val = "封禁";
         cout << left << setw(30) << append(val, 2);
         cout << "|\n";
