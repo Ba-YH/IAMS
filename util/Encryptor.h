@@ -13,89 +13,104 @@
 
 std::string key = "0123456789abcdef0123456789abcdef";
 
-std::string aes_encrypt(const std::string &plain_text);      //AES加密
-std::string aes_decrypt(const std::string &cipher_text);     //AES解密
-std::string base64_encode(const std::string &input);         //base64编码
-std::string base64_decode(const std::string &input);         //base64解码
-std::string my_encrypt(const std::string &plain_text);       //自定义加密
-std::string my_decrypt(const std::string &cipher_text);      //自定义解密
+std::string aes_encrypt(const std::string& plaintext);              //AES加密明文后使用Base64编码后得到密文
+std::string aes_decrypt(const std::string& ciphertext);             //Base64解码密文后使用AES解密得到明文
 
-// AES 加密函数
-std::string aes_encrypt(const std::string &plain_text) {
+std::string aes_encrypt(const std::string& plaintext) {
     EVP_CIPHER_CTX *ctx;
-    unsigned char iv[AES_BLOCK_SIZE] = {0};
-    unsigned char cipher_text[1024] = {0};
     int len;
-    std::string encrypted_text;
-    ctx = EVP_CIPHER_CTX_new();
-    EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (const unsigned char *) key.c_str(), iv);
-    EVP_EncryptUpdate(ctx, cipher_text, &len, (const unsigned char *) plain_text.c_str(), plain_text.length());
-    encrypted_text.append((char *) cipher_text, len);
-    EVP_EncryptFinal_ex(ctx, cipher_text + len, &len);
-    encrypted_text.append((char *) cipher_text + len);
-    EVP_CIPHER_CTX_free(ctx);
-    return encrypted_text;
-}
+    int ciphertext_len;
+    unsigned char ciphertext[plaintext.size() + AES_BLOCK_SIZE]; // 加密后的数据缓冲区
+    if(!(ctx = EVP_CIPHER_CTX_new())) {
+        return "";
+    }
+    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (const unsigned char*)key.c_str(), (const unsigned char*)"0000000000000000")) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, (const unsigned char*)plaintext.c_str(), plaintext.size())) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    ciphertext_len = len;
 
-// AES 解密函数
-std::string aes_decrypt(const std::string &cipher_text) {
-    EVP_CIPHER_CTX *ctx;
-    unsigned char iv[AES_BLOCK_SIZE] = {0};
-    unsigned char plain_text[1024] = {0};
-    int len;
-    std::string decrypted_text;
-
-    ctx = EVP_CIPHER_CTX_new();
-    EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (const unsigned char *) key.c_str(), iv);
-
-    EVP_DecryptUpdate(ctx, plain_text, &len, (const unsigned char *) cipher_text.c_str(), cipher_text.length());
-    decrypted_text.append((char *) plain_text, len);
-
-    EVP_DecryptFinal_ex(ctx, plain_text + len, &len);
-    decrypted_text.append((char *) plain_text + len);
+    // 结束加密操作
+    if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    ciphertext_len += len;
 
     EVP_CIPHER_CTX_free(ctx);
 
-    return decrypted_text;
-}
-
-// Base64 编码函数
-std::string base64_encode(const std::string &input) {
+    // 使用 Base64 编码加密后的数据
     BIO *bio, *b64;
-    BUF_MEM *bufferPtr;
+    BUF_MEM *bptr;
+
     b64 = BIO_new(BIO_f_base64());
     bio = BIO_new(BIO_s_mem());
     bio = BIO_push(b64, bio);
-    BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL);
-    BIO_write(bio, input.c_str(), input.length());
+
+    BIO_write(bio, ciphertext, ciphertext_len);
     BIO_flush(bio);
-    BIO_get_mem_ptr(bio, &bufferPtr);
-    std::string encoded_text(bufferPtr->data, bufferPtr->length);
+    BIO_get_mem_ptr(bio, &bptr);
+
+    std::string encoded_data(bptr->data, bptr->length);
+
     BIO_free_all(bio);
-    return encoded_text;
+
+    return encoded_data;
 }
 
-// Base64 解码函数
-std::string base64_decode(const std::string &input) {
+// AES 解密函数
+std::string aes_decrypt(const std::string& ciphertext) {
+    EVP_CIPHER_CTX *ctx;
+    int len;
+    int plaintext_len;
+    unsigned char plaintext[ciphertext.size()];
+
+    // 使用 Base64 解码密文
     BIO *bio, *b64;
-    char buffer[1024] = {0};
+
     b64 = BIO_new(BIO_f_base64());
-    bio = BIO_new_mem_buf(input.c_str(), input.length());
+    bio = BIO_new_mem_buf(ciphertext.c_str(), ciphertext.size());
     bio = BIO_push(b64, bio);
-    BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL);
-    int decoded_length = BIO_read(bio, buffer, input.length());
+
+    len = BIO_read(bio, plaintext, ciphertext.size());
+    plaintext_len = len;
+
     BIO_free_all(bio);
-    return std::string(buffer, decoded_length);
+
+    // 创建并初始化解密上下文
+    if(!(ctx = EVP_CIPHER_CTX_new())) {
+        return "";
+    }
+
+    // 初始化解密操作，使用 AES-256-CBC 模式
+    if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, (const unsigned char*)key.c_str(), (const unsigned char*)"0000000000000000")) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+
+    // 执行解密操作
+    if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, plaintext, plaintext_len)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    plaintext_len = len;
+
+    // 结束解密操作
+    if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) {
+        EVP_CIPHER_CTX_free(ctx);
+        return "";
+    }
+    plaintext_len += len;
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    // 返回解密后的数据
+    return std::string(reinterpret_cast<char*>(plaintext), plaintext_len);
 }
 
-std::string my_encrypt(const std::string &plain_text) {
-    std::string encrypted_text = base64_encode(aes_encrypt(plain_text));
-    return encrypted_text;
-}
-
-std::string my_decrypt(const std::string &cipher_text) {
-    std::string decrypted_text = aes_decrypt(base64_decode(cipher_text));
-    return decrypted_text;
-}
 
 #endif //ITEMAUCTIONMANAGER_AESENCRYPTOR_H

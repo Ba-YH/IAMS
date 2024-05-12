@@ -144,7 +144,7 @@ string secureInput(const std::string prompt) {
             for (int i = 1; i <= input.size(); i++) {
                 cout << "\b \b";
             }
-            cout << my_encrypt(input) << "\n";
+            cout << aes_encrypt(input) << "\n";
             break;
         }
         if (c == '\b' || c == 127) {
