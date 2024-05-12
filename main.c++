@@ -323,13 +323,14 @@ void usersList() {
 
 void banningUser() {
     string shortline;
-    for (int i = 1; i <= 53; i++) shortline += '-';
+    for (int i = 1; i <= 90 - 11; i++) shortline += '-';
     int uid = 0;
     map<string, User> userId;
     //先展示用户列表
     cout << "\n\n";
     cout << shortline << "--\n|";
-    cout << left << setw(30) << "用户编号" << left << setw(30) << "用户名" << "|\n";
+    cout << left << setw(30) << "用户编号" << left << setw(30) << "用户名" << left << setw(30) << "用户状态";
+    cout << "|\n";
     cout << "|" << shortline << "|\n";
     for (auto [username, user]: users) {
         if (username == "admin") continue;
@@ -338,14 +339,21 @@ void banningUser() {
         cout << "|";
         cout << left << setw(30) << append(id, 4);
         cout << left << setw(30) << append(user.username, 3);
+        string val;
+        if (user.isAvailable== true) val = "可用";
+        else val = "封禁";
+        cout << left << setw(30) << append(val, 2);
         cout << "|\n";
     }
     cout << shortline << "--\n";
 
-    string selectUserId = getInput<string>("请输入要封禁的用户编号：");
+    string selectUserId = getInput<string>("请输入要封禁/解封的用户编号：");
     if (userId.count(selectUserId)) {
-        users[userId[selectUserId].username].isAvailable = false;
-        outputHint("编号为［" + selectUserId + "]的用户已封禁");
+        string uername = userId[selectUserId].username;
+        if (users[uername].isAvailable)
+            outputHint("编号为［" + selectUserId + "]的用户已封禁");
+        else
+            outputHint("编号为［" + selectUserId + "]的用户已解封");
     } else {
         outputWarning("没有编号为［" + selectUserId + "］的用户\n");
     }

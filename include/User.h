@@ -28,6 +28,7 @@ public:
         username(other.username),
         password(other.password),
         sucessRate(other.sucessRate),
+        isAvailable(other.isAvailable),
         countOfSessions(other.countOfSessions),
         countOfSuccesses(other.countOfSuccesses),
         difCategoryCnt(other.difCategoryCnt){}

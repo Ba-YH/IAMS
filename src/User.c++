@@ -7,7 +7,8 @@ void to_json(nlohmann::json &j, const User &u){
             {"密码", u.password},
             {"竞拍成功率", u.sucessRate},
             {"参与竞拍次数", u.countOfSessions},
-            {"不同种类拍品成功次数", u.difCategoryCnt}
+            {"不同种类拍品成功次数", u.difCategoryCnt},
+            {"用户状态",u.isAvailable}
     };
 }
 void from_json(const nlohmann::json &j, User &u){
@@ -16,5 +17,6 @@ void from_json(const nlohmann::json &j, User &u){
     u.sucessRate = j.at("竞拍成功率").get<double>();
     u.countOfSessions = j.at("参与竞拍次数").get<int>();
     u.difCategoryCnt = j.at("不同种类拍品成功次数").get<map<string,int>>();
+    u.isAvailable=j.at("用户状态").get<bool>();
 }
 
