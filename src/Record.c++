@@ -5,7 +5,6 @@ ostream &operator<<(ostream &os, const Record &r) {
     os << left << setw(30) << append(r.getShooterName(), 3);
     os << left << setw(30) << append(double2str(r.getFinalPrice(), 2), 3);
     os << left << setw(30) << append(to_string(r.getGoodId()), 4);
-    os << endl;
     return os;
 }
 

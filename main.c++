@@ -1,3 +1,4 @@
+//@formatter:off
 #include "conio.h"
 #include <locale>
 #include <codecvt>
@@ -317,7 +318,7 @@ void modifyPassword() {
 }
 
 void usersList(){
-    //展示用户信息
+    //TODO 三线表的信息展示输出
 }
 void banningUser(){
     string shortline;
@@ -1056,25 +1057,26 @@ void displayRecords() {
     double totalPrice = 0;
     string line, shortline;
     int tranNumber = 0;
-    for (int i = 1; i <= 140; i++) line += '-';
-    for (int i = 1; i <= 40; i++) shortline += '-';
+    for (int i = 1; i <= 132; i++) line += '-';
+    for (int i = 1; i <= 61; i++) shortline += '-';
     map<string, int> cnt;
     for (const auto &[username, id]: users) {
         if (username != "admin")
             cnt[username] = 0;
     }
     if (records.size() == 0) {
-        outputHint("当前还没有用户交易记录！");
+        outputHint("\n当前还没有用户交易记录！\n");
         goto next;
     }
     //以三线表的形式展示交易记录
     cout << "交易记录如下：\n";
-    cout << line << endl;
+    cout << line << "--\n|";
     cout << left << setw(20) << "交易单号" << left << setw(40) << "交易时间";
     cout << left << setw(30) << "中拍者" << left << setw(30) << "成交价";
-    cout << left << setw(30) << "拍品编号" << endl;
-    cout << line << endl;
+    cout << left << setw(30) << "拍品编号" << "|\n";
+    cout << "|"<<line << "|"<<endl;
     for (const auto &record: records) {
+        cout<<"|";
         std::ostringstream oss;
         oss << left << setw(20) << append(int2str(++tranNumber, 6), 4);
         oss << record;
@@ -1084,10 +1086,11 @@ void displayRecords() {
         } else {
             cout << oss.str();
         }
+        cout<<"|\n";
         cnt[record.getShooterName()]++;
         totalPrice += record.getFinalPrice();
     }
-    cout << line << "\n\n";
+    cout << line << "--\n\n";
     next:
     //统计交易信息
     cout << "竞拍物品数量：" << records.size() << endl;
@@ -1109,19 +1112,20 @@ void displayRecords() {
     }
     cout << "所有用户中拍次数排名如下：\n";
     //输出用户排名，如果非管理员突出显示自己的位置
-    cout << shortline << endl;
-    cout << left << setw(10) << "排名" << left << setw(30) << "用户名" << left << setw(30) << "中拍次数" << endl;
-    cout << shortline << "\n";
+    cout << shortline << "--\n";
+    cout <<"|"<<left << setw(10) << "排名" << left << setw(30) << "用户名" << left << setw(30) << "中拍次数" << "|\n";
+    cout << "|"<<shortline << "|\n";
     for (const auto &[username, count]: shootCnt) {
+        cout<<"|";
         std::ostringstream oss;
         oss << left << setw(10) << append(int2str(ranks[count], 3), 2);
         oss << left << setw(30) << append(username, 3);
-        oss << left << setw(30) << append(to_string(count), 4) << endl;
+        oss << left << setw(30) << append(to_string(count), 4) << "|\n";
         //非管理员会突出显示自己的排名
         if (username == currentUsername) cout << "\033[33m" << oss.str() << "\033[0m";
         else cout << oss.str();
     }
-    cout << shortline;
+    cout << shortline<<"--\n";
 }
 
 /*-------------------------------------------------文件操作区----------------------------------------------*/
