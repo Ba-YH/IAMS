@@ -47,6 +47,7 @@ void login();                                                  //登录账号
 void registerUser();                                           //注册账号
 void modifyPassword();                                         //修改密码
 void banningUser();
+
 void usersList();
 
 /*物品管理*/
@@ -167,7 +168,7 @@ void selectUserMenu() {
     while (true) {
         displayUserMenu();
         operation = getInput<int>("请选择要执行的功能编号[1~4之间的整数]：");
-        if(currentUsername!="admin" and (operation<1 or operation>4)){
+        if (currentUsername != "admin" and (operation < 1 or operation > 4)) {
             outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！");
             continue;
         }
@@ -182,7 +183,7 @@ void selectUserMenu() {
                 modifyPassword();
                 break;
             case 4:
-                if(currentUsername=="admin") banningUser();
+                if (currentUsername == "admin") banningUser();
                 else return;
                 break;
             case 5:
@@ -214,11 +215,11 @@ void displayUserMenu() {
     else
         cout << right << setw(30) << "1. 切换账号";
     cout << right << setw(30) << "2. 用户注册\n";
-    if(currentUsername!="admin") {
+    if (currentUsername != "admin") {
         cout << right << setw(30) << "3. 修改密码" << right << setw(30) << "4. 返回首页\n";
-    }else{
-        cout<<right<<setw(30)<<"3. 修改密码"<<right<<setw(30)<<"4. 封禁用户\n";
-        cout<<right<<setw(30)<<"5. 用户信息"<<right<<setw(30)<<"6. 返回首页\n";
+    } else {
+        cout << right << setw(30) << "3. 修改密码" << right << setw(30) << "4. 封禁用户\n";
+        cout << right << setw(30) << "5. 用户信息" << right << setw(30) << "6. 返回首页\n";
     }
     cout << "--------------------------------------------------------------------\n";
 }
@@ -316,38 +317,40 @@ void modifyPassword() {
     }
 }
 
-void usersList(){
+void usersList() {
     //TODO 三线表的信息展示输出
 }
-void banningUser(){
-    string shortline;
-    for(int i=1;i<=53;i++) shortline+='-';
-    int uid=0;
-    map<string,User> userId;
-    //先展示用户列表
-    cout<<"\n\n";
-    cout<<shortline<<"--\n|";
-    cout<<left<<setw(30)<<"用户编号"<<left<<setw(30)<<"用户名"<<"|\n";
-    cout<<"|"<<shortline<<"|\n";
-    for(auto [username,user] : users){
-        if(username=="admin") continue;
-        string id=int2str(++uid,6);
-        userId[id]=user;
-        cout<<"|";
-        cout<<left<<setw(30)<<append(id,4);
-        cout<<left<<setw(30)<<append(user.username,3);
-        cout<<"|\n";
-    }
-    cout<<shortline<<"--\n";
 
-    string selectUserId= getInput<string>("请输入要封禁的用户编号：");
-    if(userId.count(selectUserId)){
-        users[userId[selectUserId].username].isAvailable=false;
-        outputHint("编号为［"+selectUserId+"]的用户已封禁");
-    }else{
-        outputWarning("没有编号为［"+selectUserId+"］的用户\n");
+void banningUser() {
+    string shortline;
+    for (int i = 1; i <= 53; i++) shortline += '-';
+    int uid = 0;
+    map<string, User> userId;
+    //先展示用户列表
+    cout << "\n\n";
+    cout << shortline << "--\n|";
+    cout << left << setw(30) << "用户编号" << left << setw(30) << "用户名" << "|\n";
+    cout << "|" << shortline << "|\n";
+    for (auto [username, user]: users) {
+        if (username == "admin") continue;
+        string id = int2str(++uid, 6);
+        userId[id] = user;
+        cout << "|";
+        cout << left << setw(30) << append(id, 4);
+        cout << left << setw(30) << append(user.username, 3);
+        cout << "|\n";
+    }
+    cout << shortline << "--\n";
+
+    string selectUserId = getInput<string>("请输入要封禁的用户编号：");
+    if (userId.count(selectUserId)) {
+        users[userId[selectUserId].username].isAvailable = false;
+        outputHint("编号为［" + selectUserId + "]的用户已封禁");
+    } else {
+        outputWarning("没有编号为［" + selectUserId + "］的用户\n");
     }
 }
+
 /*------------------------------------------------商品管理区-----------------------------------------------*/
 void selectGoodMenu() {
     loginOrNot();
@@ -525,9 +528,9 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     Good::maxCategoryCount = maxCategoryCount;
     Good::maxNameCount = maxNameCount;
     Good::maxDescribeCount = maxDescribeCount;
-    int sumCount=maxCategoryCount+maxNameCount+maxDescribeCount;
+    int sumCount = maxCategoryCount + maxNameCount + maxDescribeCount;
     string line;
-    for (int i = 1; i <= 200-sumCount-4-4-6-4; i++) line += "-";
+    for (int i = 1; i <= 200 - sumCount - 4 - 4 - 6 - 4; i++) line += "-";
     cout << line << "--\n|";
     cout << left << setw(20) << "物品编号";
     cout << left << setw(30) << transfer("物品名", maxNameCount);
@@ -536,13 +539,13 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     cout << left << setw(30) << "估价（万元）";
     cout << left << setw(30) << transfer("种类", maxCategoryCount);
     cout << left << setw(20) << "上传用户" << "|\n";
-    cout <<"|"<<line << "|\n";
+    cout << "|" << line << "|\n";
     int curId = 0;
     for (const auto &[goodId, good]: needToDisplay) {
         cout << "|";
-        cout << left << setw(20) <<append(to_string(goodId),4);
+        cout << left << setw(20) << append(to_string(goodId), 4);
         cout << good;
-        cout <<"|\n";
+        cout << "|\n";
     }
     cout << line << "--\n";
 }
@@ -1073,9 +1076,9 @@ void displayRecords() {
     cout << left << setw(20) << "交易单号" << left << setw(40) << "交易时间";
     cout << left << setw(30) << "中拍者" << left << setw(30) << "成交价";
     cout << left << setw(30) << "拍品编号" << "|\n";
-    cout << "|"<<line << "|"<<endl;
+    cout << "|" << line << "|" << endl;
     for (const auto &record: records) {
-        cout<<"|";
+        cout << "|";
         std::ostringstream oss;
         oss << left << setw(20) << append(int2str(++tranNumber, 6), 4);
         oss << record;
@@ -1085,7 +1088,7 @@ void displayRecords() {
         } else {
             cout << oss.str();
         }
-        cout<<"|\n";
+        cout << "|\n";
         cnt[record.getShooterName()]++;
         totalPrice += record.getFinalPrice();
     }
@@ -1112,10 +1115,11 @@ void displayRecords() {
     cout << "所有用户中拍次数排名如下：\n";
     //输出用户排名，如果非管理员突出显示自己的位置
     cout << shortline << "--\n";
-    cout <<"|"<<left << setw(10) << "排名" << left << setw(30) << "用户名" << left << setw(30) << "中拍次数" << "|\n";
-    cout << "|"<<shortline << "|\n";
+    cout << "|" << left << setw(10) << "排名" << left << setw(30) << "用户名" << left << setw(30) << "中拍次数"
+         << "|\n";
+    cout << "|" << shortline << "|\n";
     for (const auto &[username, count]: shootCnt) {
-        cout<<"|";
+        cout << "|";
         std::ostringstream oss;
         oss << left << setw(10) << append(int2str(ranks[count], 3), 2);
         oss << left << setw(30) << append(username, 3);
@@ -1124,7 +1128,7 @@ void displayRecords() {
         if (username == currentUsername) cout << "\033[33m" << oss.str() << "\033[0m";
         else cout << oss.str();
     }
-    cout << shortline<<"--\n";
+    cout << shortline << "--\n";
 }
 
 /*-------------------------------------------------文件操作区----------------------------------------------*/
