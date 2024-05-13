@@ -234,11 +234,6 @@ void login() {
     logInAgain:
     username = getInput<string>("请输入用户名：");
     string prompt = append("请输入密", 1) + "码：";
-    //检查用户封禁功能
-    if(users.count(username) and users[username].isAvailable==false){
-        outputWarning("该用户已封禁，限制登录！\n如果您对此次处罚有疑问，请联系管理员！\n");
-        return;
-    }
     if (!users.count(username)) {
         //可以直接回车
         string registerOrNot = getInput<string>("用户名未找到！是否直接使用此用户名进行注册？(y/n)", 1);
