@@ -47,6 +47,7 @@ void login();                                                  //登录账号
 void registerUser();                                           //注册账号
 void modifyPassword();                                         //修改密码
 void banningUser();
+
 void usersList();
 
 /*物品管理*/
@@ -234,7 +235,7 @@ void login() {
     logInAgain:
     username = getInput<string>("请输入用户名：");
     string prompt = append("请输入密", 1) + "码：";
-    if(users.count(username) and users[username].isAvailable==false){
+    if (users.count(username) and users[username].isAvailable == false) {
         outputWarning("当前用户已被封禁，限制登录！\n如果您对本次处罚有疑问，请联系管理员！\n");
         return;
     }
@@ -1018,7 +1019,7 @@ void sealedBiddingAuction(Good curGood) {
     for (const auto [username, user]: users) {
         if (username == uploader || username == "admin") continue;
         double P_win = predictionSuccessRate(username);
-        cout << "尊敬的" << username << "用户您好，系统综合预测您的竞买成功率为："
+        cout << "尊敬的" << username << "用户您好，系统预测当前竞买成功率为："
              << "\033[33m" << double2str(P_win, 4) << "\033[0m";
 
         string price = secureInput("\n如果你想成功竞拍，请斟酌您的递价（万元）：");
@@ -1039,20 +1040,31 @@ void sealedBiddingAuction(Good curGood) {
 
     hint = "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!!!拍卖人选择竞买人!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
     outputHighlight(hint);
-
-    cout << left << setw(30) << "参与竞买人" << setw(30) << "递交价（万元）" << endl;
+    int id = 0;
+    map<string, string> id2user;
+    string line;
+    for (int i = 1; i <= 80 - 14; i++) line += '-';
+    cout << line << "--\n|";
+    cout << left << setw(20) << "编号" << left << setw(30) << "参与竞买人" << setw(30) << "递交价（万元）" << "|\n";
+    cout << "|" << line << "|\n";
     for (auto [username, price]: sortedBidPrice) {
+        string curId = int2str(++id, 2);
+        id2user[curId] = username;
+        cout << "|";
+        cout << left << setw(20) << append(curId, 2);
         cout << left << setw(30) << append(username, 5);
-        cout << left << setw(30) << append(to_string(price), 7);
-        cout << endl;
+        cout << left << setw(30) << append(double2str(price, 4), 7);
+        cout << "|\n";
     }
+    cout << line << "--\n";
 
     //记录交易结果
-    string sel = getInput<string>("拍卖人最终选择的竞买人：");
-    if (sel.empty()) {
-        cout << "拍卖人没有选择竞买人，竞买失败！";
-    } else if (bidPrice.count(sel)) {
-        transaction(uploader, sel, curGood, bidPrice[sel]);
+    string selId = getInput<string>("拍卖人最终选择的竞买人的编号：");
+    if (selId.empty()) {
+        outputWarning("拍卖人没有选择竞买人，竞买失败！");
+    } else if (bidPrice.count(selId)) {
+        string username = id2user[selId];
+        transaction(uploader, username, curGood, bidPrice[username]);
     } else {
         outputWarning("该用户没有提交竞买价，竞买失败！");
     }
@@ -1174,7 +1186,7 @@ void displayRecords() {
         //非管理员会突出显示自己的排名
         if (username == currentUsername) cout << "\033[33m" << oss.str() << "\033[0m";
         else cout << oss.str();
-        cout<<"|\n";
+        cout << "|\n";
     }
     cout << shortline << "--\n";
 }
