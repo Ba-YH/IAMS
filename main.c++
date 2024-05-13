@@ -199,29 +199,29 @@ void selectUserMenu() {
 }
 
 void displayUserMenu() {
+    //@formatter:off
     cout << "\n\n\n\n";
-    cout << "----------------------欢迎使用物品竞拍管理系统----------------------\n";
-    string space, describe = "用户管理：";
-    cout << describe;
-    if (loginStatus) {
-        for (int i = 1; i <= 57 - currentUsername.size() - describe.size() / 2; i++) space += " ";
-        cout << space << currentUsername << "已登录\n\n";
-    } else {
-        for (int i = 1; i <= 57 - describe.size() / 2; i++) space += " ";
-        cout << space << "未登录\n\n";
+    string line,shortline;
+    string value="物品管理：";
+    for(int i=1; i<=25; i++) shortline+='-';
+    for(int i=1; i<=72; i++) line += '-';
+    cout<<shortline<<"欢迎使用物品竞拍管理系统"<<shortline<<"\n";
+    if(loginStatus){
+        cout<<"|"<<value<<right<<setw(80-value.size())<<(currentUsername+"已登录")<<"|\n";
+    }else{
+        cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
     }
-    if (loginStatus == false)
-        cout << right << setw(30) << "1. 用户登录";
-    else
-        cout << right << setw(30) << "1. 切换账号";
-    cout << right << setw(30) << "2. 用户注册\n";
-    if (currentUsername != "admin") {
-        cout << right << setw(30) << "3. 修改密码" << right << setw(30) << "4. 返回首页\n";
-    } else {
-        cout << right << setw(30) << "3. 修改密码" << right << setw(30) << "4. 封禁用户\n";
-        cout << right << setw(30) << "5. 用户信息" << right << setw(30) << "6. 返回首页\n";
+    cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
+    string loginOrRegister = loginStatus ? "1. 切换账号" : "1. 用户登录";
+    cout<<"|"<<right<<setw(30)<<loginOrRegister<<right<<setw(30)<<"2. 用户注册"<<setw(20)<<""<<"|\n";
+    if (currentUsername != "admin")
+    cout<<"|"<<right<<setw(30)<<"3. 修改密码"<<right<<setw(30)<<"4. 返回首页"<<setw(20)<<""<<"|\n";
+    else{
+    cout<<"|"<<right<<setw(30)<<"3. 修改密码"<<right<<setw(30)<<"4. 封禁用户"<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"5. 用户信息"<<right<<setw(30)<<"6. 返回首页"<<setw(20)<<""<<"|\n";
     }
-    cout << "--------------------------------------------------------------------\n";
+    cout<<line << "--\n";
+    //@formatter:on
 }
 
 void login() {
@@ -421,19 +421,25 @@ void selectGoodMenu() {
 }
 
 void displayGoodMenu() {
+    //@formatter:off
     cout << "\n\n\n\n";
-    cout << "----------------------欢迎使用物品竞拍管理系统----------------------\n";
-    string space, describe = "物品管理：";
-    cout << describe;
-    if (loginStatus) {
-        for (int i = 1; i <= 57 - currentUsername.size() - describe.size() / 2; i++) space += " ";
-        cout << space << currentUsername << "已登录\n\n";
+    string line,shortline;
+    string value="物品管理：";
+    for(int i=1; i<=25; i++) shortline+='-';
+    for(int i=1; i<=72; i++) line += '-';
+    cout<<shortline<<"欢迎使用物品竞拍管理系统"<<shortline<<"\n";
+    if(loginStatus){
+        cout<<"|"<<value<<right<<setw(80-value.size())<<(currentUsername+"已登录")<<"|\n";
+    }else{
+        cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
     }
-    cout << right << setw(30) << "1. 添加物品" << right << setw(30) << "2. 批量导入" << endl;
-    cout << right << setw(30) << "3. 删除物品" << right << setw(30) << "4. 修改物品" << endl;
-    cout << right << setw(30) << "5. 查看物品" << right << setw(30) << "6. 查询拍品" << endl;
-    cout << right << setw(30) << "7. 上传拍品" << right << setw(30) << "8. 返回首页" << endl;
-    cout << "--------------------------------------------------------------------\n";
+    cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"1. 添加物品"<<right<<setw(30)<<"2. 批量导入"<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"3. 删除物品"<<right<<setw(30)<<"4. 修改物品"<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"5. 查看物品"<<right<<setw(30)<<"6. 查询拍品"<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"7. 上传拍品"<<right<<setw(30)<<"8. 返回首页"<<setw(20)<<""<<"|\n";
+    cout<<line << "--\n";
+    //@formatter:on
 }
 
 void selGoodMenuWhitAdmin() {
@@ -464,17 +470,23 @@ void selGoodMenuWhitAdmin() {
 }
 
 void disGoodMenuWhitAdmin() {
+    //@formatter:off
     cout << "\n\n\n\n";
-    cout << "----------------------欢迎使用物品竞拍管理系统----------------------\n";
-    string space, describe = "拍品管理：";
-    cout << describe;
-    if (loginStatus) {
-        for (int i = 1; i <= 57 - currentUsername.size() - describe.size() / 2; i++) space += " ";
-        cout << space << currentUsername << "已登录\n\n";
+    string line,shortline;
+    string value="物品管理：";
+    for(int i=1; i<=25; i++) shortline+='-';
+    for(int i=1; i<=72; i++) line += '-';
+    cout<<shortline<<"欢迎使用物品竞拍管理系统"<<shortline<<"\n";
+    if(loginStatus){
+        cout<<"|"<<value<<right<<setw(80-value.size())<<(currentUsername+"已登录")<<"|\n";
+    }else{
+        cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
     }
-    cout << right << setw(30) << "1. 下架拍品" << right << setw(30) << "2. 修改拍品" << endl;
-    cout << right << setw(30) << "3. 查询拍品" << right << setw(30) << "4. 返回首页" << endl;
-    cout << "--------------------------------------------------------------------\n";
+    cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"1. 下架物品"<<right<<setw(30)<<"2. 修改物品"<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"3. 查询拍品"<<right<<setw(30)<<"4. 返回首页"<<setw(20)<<""<<"|\n";
+    cout<<line << "--\n";
+    //@formatter:on
 }
 
 void userAddGood(string username, Good g) {
@@ -907,20 +919,23 @@ void selectRecordMenu() {
 }
 
 void displayRecordMenu() {
+    //@formatter:off
     cout << "\n\n\n\n";
-    cout << "----------------------欢迎使用物品竞拍管理系统----------------------\n";
-    string space, describe = "交易管理：";
-    cout << describe;
-    if (loginStatus) {
-        for (int i = 1; i <= 57 - currentUsername.size() - describe.size() / 2; i++) space += " ";
-        cout << space << currentUsername << "已登录\n\n";
-    } else {
-        for (int i = 1; i <= 57 - describe.size() / 2; i++) space += " ";
-        cout << space << "未登录\n\n";
+    string line,shortline;
+    string value="交易管理：";
+    for(int i=1; i<=25; i++) shortline+='-';
+    for(int i=1; i<=72; i++) line += '-';
+    cout<<shortline<<"欢迎使用物品竞拍管理系统"<<shortline<<"\n";
+    if(loginStatus){
+        cout<<"|"<<value<<right<<setw(80-value.size())<<(currentUsername+"已登录")<<"|\n";
+    }else{
+        cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
     }
-    cout << right << setw(30) << "1. 交易记录" << right << setw(30) << "2. 开始竞拍" << endl;
-    cout << right << setw(30) << "3. 返回首页" << endl;
-    cout << "----------------------------------------------------------------------\n";
+    cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"1. 交易记录"<< right<<setw(30)<<"2. 开始竞拍"   <<right<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"3. 返回首页"<< right<<setw(30)<<append("", 4) <<right<<setw(20)<<""<<"|\n";
+    cout << line << "--\n";
+    //@formatter:on
 }
 
 void englandAuction(Good curGood) {
@@ -1152,10 +1167,11 @@ void displayRecords() {
         std::ostringstream oss;
         oss << left << setw(10) << append(int2str(ranks[count], 3), 2);
         oss << left << setw(30) << append(username, 3);
-        oss << left << setw(30) << append(to_string(count), 4) << "|\n";
+        oss << left << setw(30) << append(to_string(count), 4);
         //非管理员会突出显示自己的排名
         if (username == currentUsername) cout << "\033[33m" << oss.str() << "\033[0m";
         else cout << oss.str();
+        cout<<"|\n";
     }
     cout << shortline << "--\n";
 }
@@ -1249,28 +1265,25 @@ void saveRecords() {
 
 /*-------------------------------------------------首页----------------------------------------------------*/
 void displayMainMenu() {
+    //@formatter:off
     cout << "\n\n\n\n";
-    string title = "----------------------欢迎使用物品竞拍管理系统----------------------\n";
-    string space, describe = "首页：";
-    cout << title << describe;
-    if (loginStatus) {
-        for (int i = 1; i <= 57 - currentUsername.size() - utf8len(describe); i++) space += " ";
-        cout << space << currentUsername << "已登录\n\n";
-    } else {
-        for (int i = 1; i <= 57 - utf8len(describe); i++) space += " ";
-        cout << space << "未登录\n\n";
+    string line,shortline;
+    string value="首页：";
+    for(int i=1; i<=25; i++) shortline+='-';
+    for(int i=1; i<=72; i++) line += '-';
+    cout<<shortline<<"欢迎使用物品竞拍管理系统"<<shortline<<"\n";
+    if(loginStatus){
+        cout<<"|"<<value<<right<<setw(80-value.size()-2)<<(currentUsername+"已登录")<<"|\n";
+    }else{
+        cout<<"|"<<value<<right<<setw(80-value.size()-2)<<("未登录")<<"|\n";
     }
-    cout << right << setw(30) << "1. 用户管理" << right << setw(30) << "2. 物品管理\n";
-    if (currentUsername != "admin") {
-        cout << right << setw(30) << "3. 交易记录";
-    } else {
-        cout << right << setw(30) << "3. 交易管理";
-    }
-    cout << right << setw(30) << "4. 关于系统\n";
-    cout << right << setw(30) << "5. 退出系统" << endl;//最后输入结束采用endl 前面换行用\n
-    string line;
-    for (int i = 1; i <= title.size() - 13; i++) line += '-';
-    cout << line << endl;
+    string recordsValue=currentUsername=="admin"?"3. 交易管理":"3. 交易记录";
+    cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"1. 用户管理"<<right<<setw(30)<<"2. 物品管理" <<right<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<setw(30)<<recordsValue<<right<<setw(30)<<"4. 关于系统" <<right<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<setw(30)<<"5. 退出系统"<<right<<setw(30)<<append("",4) <<right<<setw(20)<<""<<"|\n";
+    cout << line << "--\n";
+    //@formatter:on
 }
 
 void systemIntroduction() {
