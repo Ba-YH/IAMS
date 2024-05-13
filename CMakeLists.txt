@@ -2,7 +2,11 @@
 cmake_minimum_required(VERSION 3.27)
 #项目名称
 project(itemAuctionManagementSystem)
+#C++标准
 set(CMAKE_CXX_STANDARD 17)
+
+#关闭警告
+add_definitions(-Wno-unused-variable)
 #设置源文件
 set(SOURCE_FILE main.c++)
 
@@ -14,6 +18,3 @@ find_package(OpenSSL REQUIRED)
 add_executable(main ${SOURCE_FILE})
 # 链接 OpenSSL 库
 target_link_libraries(main OpenSSL::Crypto)
-
-#关闭警告
-add_definitions(-Wno-unused-variable)

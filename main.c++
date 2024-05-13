@@ -47,7 +47,6 @@ void login();                                                  //登录账号
 void registerUser();                                           //注册账号
 void modifyPassword();                                         //修改密码
 void banningUser();
-
 void usersList();
 
 /*物品管理*/

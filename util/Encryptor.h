@@ -2,8 +2,8 @@
 // Created by 巴云浩 on 2024/4/30.
 //
 
-#ifndef ITEMAUCTIONMANAGER_AESENCRYPTOR_H
-#define ITEMAUCTIONMANAGER_AESENCRYPTOR_H
+#ifndef ITEMAUCTIONMANAGER_ENCRYPTOR_H
+#define ITEMAUCTIONMANAGER_ENCRYPTOR_H
 
 #include <bits/stdc++.h>
 #include <openssl/evp.h>
