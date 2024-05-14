@@ -204,7 +204,7 @@ void displayUserMenu() {
     //@formatter:off
     cout << "\n\n\n\n";
     string line,shortline;
-    string value="物品管理：";
+    string value="用户管理：";
     for(int i=1; i<=25; i++) shortline+='-';
     for(int i=1; i<=72; i++) line += '-';
     cout<<shortline<<"欢迎使用物品竞拍管理系统"<<shortline<<"\n";
