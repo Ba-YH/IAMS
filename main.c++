@@ -26,7 +26,7 @@ string currentUsername;                                        //当前用户名
 vector<Record> records;                                        //交易记录
 map<string, User> users;                                       //用户数据表
 map<string, map<int, Good>> tables;                            //用户物品表
-map<string, int> newGoodId;                                    //生成用户下一件物品的ID
+map<string, int> numberOfGoods;                                //用户物品数量
 hash<string> hasher;                                           //哈希函数
 string goodsfilename = "../data/goods.json";                   //拍卖品数据文件位置
 string usersfilename = "../data/users.json";                   //用户数据文件位置
@@ -508,11 +508,11 @@ void userAddGood(string username, Good g) {
         return;
     }
     //第一件商品编号为用户名哈希，后面递增（确保唯一性）
-    int goodId;
-    if (!newGoodId.count(username)) {
-        goodId = stoi(to_string(hasher(username)).substr(0, 6));
-    } else goodId = newGoodId[username] + 1;
-    newGoodId[username] = goodId + 1;
+    int goodId=stoi(to_string(hasher(username)).substr(0, 6));
+    if(numberOfGoods.count(username)){
+        goodId+=numberOfGoods[username]-1;
+    }
+    numberOfGoods[username]++;
     //在添加物品时设置
     g.setId(goodId);
     tables[username][goodId] = g;
@@ -1232,10 +1232,9 @@ void loadData() {
             for (const auto &[goodID, goodJson]: innerJ.items()) {
                 Good good = goodJson.get<Good>(); //使用反序列化从JSON格式读取对象
                 goods[stoi(goodID)] = good;
-                //更新用户下一个商品ID
-                newGoodId[username] = max(newGoodId[username], stoi(goodID));
+                numberOfGoods[username]++;
                 if (username == "admin") {
-                    newGoodId[good.getUploader()] = max(newGoodId[good.getUploader()], stoi(goodID));
+                    numberOfGoods[good.getUploader()]++;
                 }
             }
             tables[username] = goods;
