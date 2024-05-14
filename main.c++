@@ -26,7 +26,7 @@ string currentUsername;                                        //当前用户名
 vector<Record> records;                                        //交易记录
 map<string, User> users;                                       //用户数据表
 map<string, map<int, Good>> tables;                            //用户物品表
-map<string, int> numberOfGoods;                                //用户物品数量
+map<string, int> maxGoodId;                                    //记录用户最大的物品编号
 hash<string> hasher;                                           //哈希函数
 string goodsfilename = "../data/goods.json";                   //拍卖品数据文件位置
 string usersfilename = "../data/users.json";                   //用户数据文件位置
@@ -85,7 +85,7 @@ void transaction(string uploader,
 void loadData();                                               //读取文件
 void saveToFile();                                             //保存到文件
 void saveUsers();                                              //保存用户数据
-void saveGoods();                                              //保存商品数据
+void saveGoods();                                              //保存物品数据
 void saveRecords();                                            //保存记录数据
 
 /*首页*/
@@ -393,7 +393,7 @@ void banningUser() {
     }
 }
 
-/*------------------------------------------------商品管理区-----------------------------------------------*/
+/*------------------------------------------------物品管理区-----------------------------------------------*/
 void selectGoodMenu() {
     loginOrNot();
     int operation;
@@ -507,18 +507,21 @@ void userAddGood(string username, Good g) {
         return;
     }
     //第一件商品编号为用户名哈希，后面递增（确保唯一性）
-    int goodId=stoi(to_string(hasher(username)).substr(0, 6));
-    if(numberOfGoods.count(username)){
-        goodId+=numberOfGoods[username];
+    int goodId;
+    if(!maxGoodId.count(username)){
+        goodId=stoi(to_string(hasher(username)).substr(0, 6));
+    }else{
+        goodId=maxGoodId[username]+1;
     }
-    numberOfGoods[username]++;
+    //设置为当前物品编号
+    maxGoodId[username]=goodId;
     //在添加物品时设置
     g.setId(goodId);
     tables[username][goodId] = g;
 }
 
 void addGood() {
-    string goodName = getInput<string>("请输入商品名称：");
+    string goodName = getInput<string>("请输入物品名称：");
     double degreeOfImpairment = getInput<double>("请输入物品磨损程度(0~1之间的两位小数(会自动取舍)：");
     string describe = getInput<string>("请输入物品描述(注意详略得当)：");
     double appraisal = getInput<double>("请输入物品估价(单位：万元)：");
@@ -615,7 +618,7 @@ void deleteGood() {
     delAgain:
     currentGoods = tables[currentUsername];
     if (currentGoods.size() == 0) {
-        outputWarning("您已删除完全部商品！");
+        outputWarning("您已删除完全部物品！");
         return;
     }
 
@@ -705,12 +708,12 @@ void modifyGood() {
 void getGoodById(map<int, Good> goods) {
     int selId = getInput<int>("请输入物品编号:");
     if (!goods.count(selId)) {
-        outputWarning("没有查询到该商品，如果忘记编号建议使用[按照类型/名称查询]");
+        outputWarning("没有查询到该物品，如果忘记编号建议使用[按照类型/名称查询]");
         return;
     }
     map<int, Good> selGoods;
     selGoods[selId] = goods[selId];
-    outputHint("\n编号为" + ("[" + to_string(selId) + "]") + "的物品信息如下：\n");
+    outputHint("\n编号为" + ("[" + to_string(selId) + "]") + "的物品信息如下：");
     displayMyGoods(selGoods);
 }
 
@@ -737,10 +740,10 @@ void getGoodByCategory(map<int, Good> goods) {
         }
     }
     if (selGoods.size() == 0) {
-        outputWarning("您还没有该类型物品哦~\n");
+        outputWarning("没有找到类别为［" + specifyCatagory + "］的物品！\n");
         return;
     }
-    outputHint(("\n［" + specifyCatagory + "]") + "］类的物品信息如下：\n");
+    outputHint("\n［" + specifyCatagory + "］类的物品信息如下：");
     displayMyGoods(selGoods);
 }
 
@@ -756,7 +759,7 @@ void getGoodByName(map<int, Good> goods) {
         outputWarning("没有找到名为［" + specifyGoodName + "］的物品！");
         return;
     }
-    outputHint("\n名为［" + specifyGoodName + "］的商品信息如下：\n");
+    outputHint("\n名为［" + specifyGoodName + "］的物品信息如下：");
     displayMyGoods(selGoods);
 }
 
@@ -953,7 +956,7 @@ void englandAuction(Good curGood) {
 
     double prePrice = startingPrice;
     string preUsername;
-    outputHighlight("~~~~~~~~~~~~~~~~~~~~~~!!!用户进行出价!!!~~~~~~~~~~~~~~~~~~~~~");
+    outputHighlight("用户进行出价");
     while (1) {
         //获取随机全排列 -> 遍历用户获得出价
         int numberOfAbandonments = 0;
@@ -979,18 +982,16 @@ void englandAuction(Good curGood) {
         if (numberOfAbandonments == number - 1) break;
     }
     //结束信息
-    outputHighlight("无人继续加价，最终成交价为：" + double2str(prePrice, 4));
+    outputHighlight("无人继续加价，最终竞买价为：" + double2str(prePrice, 4));
     if (prePrice < reservePrice) {
-        outputWarning("\n由于最终成交价小于物品的保留价，拍卖失败！");
+        outputWarning("\n由于最终成交价小于物品的保留价，交易失败！\n");
     } else {
         transaction(uploder, preUsername, curGood, prePrice);
     }
 }
 
 void sealedBiddingAuction(Good curGood) {
-    string hint;
-    hint = "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!!!竞买人将出价加密发送给拍卖人!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
-    outputHighlight(hint);
+    outputHighlight("\n竞买人将出价加密发送给拍卖人\n");
     map<string, int> bidPrice;
     string uploader = curGood.getUploader();
     string category = curGood.getCategory();
@@ -1012,9 +1013,8 @@ void sealedBiddingAuction(Good curGood) {
     for (const auto [username, user]: users) {
         if (username == uploader || username == "admin") continue;
         double P_win = predictionSuccessRate(username);
-        cout << "尊敬的" << username << "用户您好，系统预测当前竞买成功率为："
-             << "\033[33m" << double2str(P_win, 4) << "\033[0m";
-
+        cout<<"当前由"<<username<<"用户递交竞价，回车可放弃竞买！\n";
+        cout<<"系统预测当前竞买成功率为："<< "\033[33m" << double2str(P_win, 4) << "\033[0m";
         string price = secureInput("\n如果你想成功竞拍，请斟酌您的递价（万元）：");
         cout << "\n";
         if (!price.empty()) {
@@ -1031,14 +1031,13 @@ void sealedBiddingAuction(Good curGood) {
              return a.second > b.second;
          });
 
-    hint = "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!!!拍卖人选择竞买人!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
-    outputHighlight(hint);
+    outputHighlight("\n\n拍卖人选择竞买人，若没有满意的递价请回车放弃选择！\n\n");
     int id = 0;
     map<string, string> id2user;
     string line;
-    for (int i = 1; i <= 80 - 14; i++) line += '-';
+    for (int i = 1; i <= 90 - 14; i++) line += '-';
     cout << line << "--\n|";
-    cout << left << setw(20) << "编号" << left << setw(30) << "参与竞买人" << setw(30) << "递交价（万元）" << "|\n";
+    cout << left << setw(20) << "编号" << left << setw(30) << "参与竞买人" << setw(40) << "递交价（万元）" << "|\n";
     cout << "|" << line << "|\n";
     for (auto [username, price]: sortedBidPrice) {
         string curId = int2str(++id, 2);
@@ -1046,20 +1045,20 @@ void sealedBiddingAuction(Good curGood) {
         cout << "|";
         cout << left << setw(20) << append(curId, 2);
         cout << left << setw(30) << append(username, 5);
-        cout << left << setw(30) << append(double2str(price, 4), 7);
+        cout << left << setw(40) << append(double2str(price, 4), 7);
         cout << "|\n";
     }
     cout << line << "--\n";
 
     //记录交易结果
     string selId = getInput<string>("拍卖人最终选择的竞买人的编号：");
+    string username=id2user[selId];
     if (selId.empty()) {
         outputWarning("拍卖人没有选择竞买人，竞买失败！");
-    } else if (bidPrice.count(selId)) {
-        string username = id2user[selId];
+    } else if (bidPrice.count(username)) {
         transaction(uploader, username, curGood, bidPrice[username]);
     } else {
-        outputWarning("该用户没有提交竞买价，竞买失败！");
+        outputWarning("没有找到竞买记录，竞买失败！");
     }
 }
 
@@ -1206,18 +1205,19 @@ void loadData() {
     usersFile.close();
 
 
-    //加载各用户的商品表
+    //加载各用户的物品表
     ifstream goodsFile(goodsfilename);
     goodsFile >> j;
     if (!j.empty()) {
         for (const auto &[username, innerJ]: j.items()) {
             map<int, Good> goods;
-            for (const auto &[goodID, goodJson]: innerJ.items()) {
+            for (const auto &[goodId, goodJson]: innerJ.items()) {
                 Good good = goodJson.get<Good>(); //使用反序列化从JSON格式读取对象
-                goods[stoi(goodID)] = good;
-                numberOfGoods[username]++;
+                goods[stoi(goodId)] = good;
+                maxGoodId[username]=max(maxGoodId[username],stoi(goodId));
                 if (username == "admin") {
-                    numberOfGoods[good.getUploader()]++;
+                    string uploader = good.getUploader();
+                    maxGoodId[uploader] = max(maxGoodId[uploader], stoi(goodId));
                 }
             }
             tables[username] = goods;
