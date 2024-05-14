@@ -243,11 +243,18 @@ void login() {
         //可以直接回车
         string registerOrNot = getInput<string>("用户名未找到！是否直接使用此用户名进行注册？(y/n)", 1);
         if (registerOrNot == "y" || registerOrNot.empty()) {
+            inputAgain:
             password = getInput<string>(prompt);
-            //添加用户,计算新的用户ID->添加到用户ID表->添加到用户表
-            User addUser(username, password);
-            users[username] = addUser;
-            outputHint("注册成功，请重新登录！\n");
+            string passwordAgain = getInput<string>("再次确认密码：");
+            if(passwordAgain==password) {
+                //添加用户,计算新的用户ID->添加到用户ID表->添加到用户表
+                User addUser(username, password);
+                users[username] = addUser;
+                outputHint("注册成功，请重新登录！\n");
+            }else{
+                outputWarning("两次输入密码不一致，请重新输入！\n");
+                goto inputAgain;
+            }
         } else {
             outputWarning("请检查用户名并重新登录！\n\n");
         }
