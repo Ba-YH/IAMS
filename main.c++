@@ -167,8 +167,8 @@ void selectUserMenu() {
     while (true) {
         displayUserMenu();
         //菜单项个数
-        string menuItemNum = (currentUsername=="admin"?"6":"4");
-        operation = getInput<int>("请选择要执行的功能编号[1~"+menuItemNum+"]之间的整数：");
+        string menuItemNum = (currentUsername == "admin" ? "6" : "4");
+        operation = getInput<int>("请选择要执行的功能编号[1~" + menuItemNum + "]之间的整数：");
         if (currentUsername != "admin" and (operation < 1 or operation > 4)) {
             outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！");
             continue;
@@ -247,12 +247,12 @@ void login() {
             inputAgain:
             password = getInput<string>(prompt);
             string passwordAgain = getInput<string>("再次确认密码：");
-            if(passwordAgain==password) {
+            if (passwordAgain == password) {
                 //添加用户,计算新的用户ID->添加到用户ID表->添加到用户表
                 User addUser(username, password);
                 users[username] = addUser;
                 outputHint("注册成功，请重新登录！\n");
-            }else{
+            } else {
                 outputWarning("两次输入密码不一致，请重新输入！\n");
                 goto inputAgain;
             }
@@ -339,7 +339,7 @@ void usersList() {
     cout << "|\n";
     cout << "|" << line << "|\n";
     for (auto [username, user]: users) {
-        if(username=="admin") continue;
+        if (username == "admin") continue;
         cout << "|";
         cout << left << setw(30) << append(username, 3);
         cout << left << setw(30) << append(user.password, 2);
@@ -508,13 +508,13 @@ void userAddGood(string username, Good g) {
     }
     //第一件商品编号为用户名哈希，后面递增（确保唯一性）
     int goodId;
-    if(!maxGoodId.count(username)){
-        goodId=stoi(to_string(hasher(username)).substr(0, 6));
-    }else{
-        goodId=maxGoodId[username]+1;
+    if (!maxGoodId.count(username)) {
+        goodId = stoi(to_string(hasher(username)).substr(0, 6));
+    } else {
+        goodId = maxGoodId[username] + 1;
     }
     //设置为当前物品编号
-    maxGoodId[username]=goodId;
+    maxGoodId[username] = goodId;
     //在添加物品时设置
     g.setId(goodId);
     tables[username][goodId] = g;
@@ -555,14 +555,14 @@ void addGood() {
 
 void removeGood() {
     map<int, Good> goods = tables["admin"];
-    cout<<"\n\n当前所有拍品的信息如下：\n";
+    cout << "\n\n当前所有拍品的信息如下：\n";
     displayMyGoods(goods);
     int selId = getInput<int>("请选择要下架的拍品编号：");
     if (tables["admin"].count(selId)) {
         Good g = tables["admin"][selId];
         userAddGood(g.getUploader(), g);
         tables["admin"].erase(selId);
-        outputHint("编号为［"+to_string(selId)+"］的拍品已下架！\n");
+        outputHint("编号为［" + to_string(selId) + "］的拍品已下架！\n");
     } else {
         outputWarning("没有此编号的拍品，请重新输入！");
         removeGood();
@@ -656,7 +656,7 @@ void modifyGood() {
     //继续修改
     modifyAgain:
     currentGoods = tables[currentUsername];
-    cout<<"\n\n所有物品的信息如下：\n";
+    cout << "\n\n所有物品的信息如下：\n";
     displayMyGoods(currentGoods);
     int modifyId = getInput<int>("您当前共有" + to_string(currentGoods.size()) + "个物品，请输入您想修改物品的编号：");
     if (!currentGoods.count(modifyId)) {
@@ -676,7 +676,7 @@ void modifyGood() {
                                        + "\n请输入新的描述（注意详略得当）：");
     if (!describe.empty()) selGood.setDescribe(describe);
     string apprisals = getInput<string>(
-            "\n当前估价为（万元）：" + double2str(selGood.getAppraisal(),4)
+            "\n当前估价为（万元）：" + double2str(selGood.getAppraisal(), 4)
             + "\n请输入新的估价（万元）：");
     if (!apprisals.empty()) selGood.setAppraisal(stod(apprisals));
 
@@ -860,7 +860,6 @@ void uploadGood() {
 }
 
 
-
 void batchAddGood() {
     inputAgain:
     string fileName = getInput<string>("请输入文件路径，注意只能是JSON格式文件：");
@@ -949,37 +948,52 @@ void englandAuction(Good curGood) {
 
     vector<string> participants;
     for (const auto [username, user]: users) {
-        if (username == "admin" || username == uploder) continue;
+        if (username == "admin" || username == uploder || user.isAvailable == false) continue;
         participants.push_back(username);
     }
     int number = participants.size();
 
     double prePrice = startingPrice;
     string preUsername;
-    outputHighlight("用户进行出价");
-    while (1) {
-        //获取随机全排列 -> 遍历用户获得出价
-        int numberOfAbandonments = 0;
-        vector<int> indexs(number);
-        iota(indexs.begin(), indexs.end(), 0);
-        unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-        default_random_engine rng(seed);
-        shuffle(indexs.begin(), indexs.end(), rng);
+    outputHighlight("\n\n下面由用户进行出价\n");
 
+    //出价顺序全排列
+    int numberOfAbandonments = 0;
+    vector<int> indexs(number);
+    iota(indexs.begin(), indexs.end(), 0);
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    default_random_engine rng(seed);
+    shuffle(indexs.begin(), indexs.end(), rng);
+    set<string> abandonUsers,joinUsers;
+    while (1) {
         for (int index: indexs) {
+            inputAgain:
             string username = participants[index];
             double curNeed = prePrice + minIncrement;
-            string hint = username + "［当前最低出价为 " + double2str(curNeed, 4)
+            cout << setw(10) << username;
+            string hint = "［当前最低出价为 " + double2str(curNeed, 4)
                           + "(万元)" + (curNeed > apprisal ? "  \033[33m已超出估价\033[0m" : "") + "］：";
             string price = getInput<string>(hint);
             if (price.empty()) {
-                numberOfAbandonments++;
-            } else {
+                abandonUsers.insert(username);
+            } else if(stod(price) < curNeed){
+                outputWarning("当前出价低于最低出价，请重新出价或者放弃！\n");
+                goto inputAgain;
+            }
+            else{
+                abandonUsers.clear();
+                joinUsers.insert(username);
                 prePrice = stod(price);
                 preUsername = username;
             }
+            if (abandonUsers.size() == participants.size() - 1) {
+                goto next;
+            }
         }
-        if (numberOfAbandonments == number - 1) break;
+    }
+    next:
+    for(string username : joinUsers){
+        users[username].countOfSessions++;
     }
     //结束信息
     outputHighlight("无人继续加价，最终竞买价为：" + double2str(prePrice, 4));
@@ -1011,10 +1025,10 @@ void sealedBiddingAuction(Good curGood) {
     };
 
     for (const auto [username, user]: users) {
-        if (username == uploader || username == "admin") continue;
+        if (username == uploader || username == "admin" || user.isAvailable == false) continue;
         double P_win = predictionSuccessRate(username);
-        cout<<"当前由"<<username<<"用户递交竞价，回车可放弃竞买！\n";
-        cout<<"系统预测当前竞买成功率为："<< "\033[33m" << double2str(P_win, 4) << "\033[0m";
+        cout << "当前由" << username << "用户递交竞价，回车可放弃竞买！\n";
+        cout << "系统预测当前竞买成功率为：" << "\033[33m" << double2str(P_win, 4) << "\033[0m";
         string price = secureInput("\n如果你想成功竞拍，请斟酌您的递价（万元）：");
         cout << "\n";
         if (!price.empty()) {
@@ -1031,7 +1045,7 @@ void sealedBiddingAuction(Good curGood) {
              return a.second > b.second;
          });
 
-    outputHighlight("\n\n拍卖人选择竞买人，若没有满意的递价请回车放弃选择！\n\n");
+    outputHighlight("\n\n拍卖人选择竞买人，若没有满意的递价请回车放弃选择！");
     int id = 0;
     map<string, string> id2user;
     string line;
@@ -1052,7 +1066,7 @@ void sealedBiddingAuction(Good curGood) {
 
     //记录交易结果
     string selId = getInput<string>("拍卖人最终选择的竞买人的编号：");
-    string username=id2user[selId];
+    string username = id2user[selId];
     if (selId.empty()) {
         outputWarning("拍卖人没有选择竞买人，竞买失败！");
     } else if (bidPrice.count(username)) {
@@ -1086,19 +1100,22 @@ void auction() {
 
 void transaction(string uploader, string shootername, Good g, double price) {
     //竞买成功提示
-    string goodNews = "恭喜" + shootername + "以" + double2str(price, 2) + "万元的成交价，将［"
-                      + g.getGoodName() + "］收入囊中";
+    string goodNews = "恭喜" + shootername + "以" + double2str(price, 2) + "万元的成交价,将" +
+                      "用户" + uploader + "上传的［" + g.getGoodName() + "］收入囊中";
     outputHighlight(goodNews);
     //物品转移
-    tables[uploader].erase(g.getId());
+    tables["admin"].erase(g.getId());
     g.setAppraisal(price * 0.9);
-    g.setUploader("");
+    g.setUploader(shootername);
     userAddGood(shootername, g);
     //更新用户信息
-    users[shootername].difCategoryCnt[g.getCategory()]++;
-    users[shootername].countOfSuccesses++;
-    users[shootername].sucessRate = users[shootername].countOfSuccesses / users[shootername].countOfSessions;
-
+    int cnt1=users[shootername].countOfSessions;
+    int cnt=users[shootername].sucessRate*cnt1;
+    string category=g.getCategory();
+    //更新成功率，各类型拍品成功次数和成功率
+    users[shootername].sucessRate=(cnt+1.0)/cnt1;
+    users[shootername].difCategoryCnt[category]++;
+    users[shootername].difCategorySucessRate[category]=users[shootername].difCategoryCnt[category]/cnt1;
     //交易记录
     Record record(g.getId(), price, shootername);
     records.push_back(record);
@@ -1122,7 +1139,7 @@ void displayRecords() {
         goto next;
     }
     //以三线表的形式展示交易记录
-    cout << "交易记录如下：\n";
+    cout << "\n\n交易记录如下：\n";
     cout << line << "--\n|";
     cout << left << setw(20) << "交易单号" << left << setw(40) << "交易时间";
     cout << left << setw(30) << "中拍者" << left << setw(30) << "成交价";
@@ -1214,7 +1231,7 @@ void loadData() {
             for (const auto &[goodId, goodJson]: innerJ.items()) {
                 Good good = goodJson.get<Good>(); //使用反序列化从JSON格式读取对象
                 goods[stoi(goodId)] = good;
-                maxGoodId[username]=max(maxGoodId[username],stoi(goodId));
+                maxGoodId[username] = max(maxGoodId[username], stoi(goodId));
                 if (username == "admin") {
                     string uploader = good.getUploader();
                     maxGoodId[uploader] = max(maxGoodId[uploader], stoi(goodId));
