@@ -167,7 +167,9 @@ void selectUserMenu() {
     int operation;
     while (true) {
         displayUserMenu();
-        operation = getInput<int>("请选择要执行的功能编号[1~4之间的整数]：");
+        //菜单项个数
+        string menuItemNum = (currentUsername=="admin"?"6":"4");
+        operation = getInput<int>("请选择要执行的功能编号[1~"+menuItemNum+"]之间的整数：");
         if (currentUsername != "admin" and (operation < 1 or operation > 4)) {
             outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！");
             continue;
@@ -398,7 +400,7 @@ void selectGoodMenu() {
     int operation;
     while (true) {
         displayGoodMenu();
-        operation = getInput<int>("请选择要输入的编号[1~8之间的整数]：");
+        operation = getInput<int>("请选择要输入的编号[1~8]之间的整数：");
         switch (operation) {
             case 1:
                 addGood();
@@ -459,7 +461,7 @@ void selGoodMenuWhitAdmin() {
     int operation;
     while (true) {
         disGoodMenuWhitAdmin();
-        operation = getInput<int>("请选择要输入的编号[1~4之间的整数]：");
+        operation = getInput<int>("请选择要输入的编号[1~4]之间的整数：");
         switch (operation) {
             case 1:
                 removeGood();
@@ -912,7 +914,7 @@ void selectRecordMenu() {
     int operation;
     while (true) {
         displayRecordMenu();
-        operation = getInput<int>("请选择要输入的编号[1~3之间的整数]：");
+        operation = getInput<int>("请选择要输入的编号[1~3]之间的整数：");
         switch (operation) {
             case 1:
                 displayRecords();
@@ -1365,7 +1367,7 @@ void selectMainMenu() {
                 exitTheSystem();
                 break;
             default:
-                outputWarning("输入有误，请检查输入是否是[1~4]之间的整数！");
+                outputWarning("输入有误，请检查输入是否是[1~5]之间的整数！");
         }
     }
 }
