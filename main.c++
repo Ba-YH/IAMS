@@ -340,6 +340,7 @@ void usersList() {
     cout << "|\n";
     cout << "|" << line << "|\n";
     for (auto [username, user]: users) {
+        if(username=="admin") continue;
         cout << "|";
         cout << left << setw(30) << append(username, 3);
         cout << left << setw(30) << append(user.password, 2);
@@ -355,7 +356,7 @@ void banningUser() {
     int uid = 0;
     map<string, User> userId;
     //先展示用户列表
-    cout << "\n\n";
+    cout << "\n\n当前用户状态：\n";
     cout << shortline << "--\n|";
     cout << left << setw(30) << "用户编号" << left << setw(30) << "用户名" << left << setw(30) << "用户状态";
     cout << "|\n";
@@ -385,9 +386,9 @@ void banningUser() {
     if (userId.count(selectUserId)) {
         string uername = userId[selectUserId].username;
         if (users[uername].isAvailable)
-            outputHint("编号为［" + selectUserId + "]的用户已封禁");
+            outputHint("编号为［" + selectUserId + "］的用户已封禁");
         else
-            outputHint("编号为［" + selectUserId + "]的用户已解封");
+            outputHint("编号为［" + selectUserId + "］的用户已解封");
     } else {
         outputWarning("没有编号为［" + selectUserId + "］的用户\n");
     }
@@ -552,12 +553,14 @@ void addGood() {
 
 void removeGood() {
     map<int, Good> goods = tables["admin"];
+    cout<<"\n\n当前所有拍品的信息如下：\n";
     displayMyGoods(goods);
     int selId = getInput<int>("请选择要下架的拍品编号：");
     if (tables["admin"].count(selId)) {
         Good g = tables["admin"][selId];
         userAddGood(g.getUploader(), g);
         tables["admin"].erase(selId);
+        outputHint("编号为［"+to_string(selId)+"］的拍品已下架！\n");
     } else {
         outputWarning("没有此编号的拍品，请重新输入！");
         removeGood();
@@ -651,7 +654,7 @@ void modifyGood() {
     //继续修改
     modifyAgain:
     currentGoods = tables[currentUsername];
-    outputHint("\n所有物品的信息如下：\n");
+    cout<<"\n\n所有物品的信息如下：\n";
     displayMyGoods(currentGoods);
     int modifyId = getInput<int>("您当前共有" + to_string(currentGoods.size()) + "个物品，请输入您想修改物品的编号：");
     if (!currentGoods.count(modifyId)) {
@@ -671,7 +674,7 @@ void modifyGood() {
                                        + "\n请输入新的描述（注意详略得当）：");
     if (!describe.empty()) selGood.setDescribe(describe);
     string apprisals = getInput<string>(
-            "\n当前估价为（万元）：" + to_string(selGood.getAppraisal())
+            "\n当前估价为（万元）：" + double2str(selGood.getAppraisal(),4)
             + "\n请输入新的估价（万元）：");
     if (!apprisals.empty()) selGood.setAppraisal(stod(apprisals));
 
@@ -1345,7 +1348,7 @@ void selectMainMenu() {
     int operation;
     while (true) {
         displayMainMenu();
-        operation = getInput<int>("请选择要输入的编号[1~4之间的整数]：");
+        operation = getInput<int>("请选择要输入的编号[1~5]之间的整数：");
         switch (operation) {
             case 1:
                 selectUserMenu();
