@@ -396,7 +396,6 @@ void banningUser() {
 /*------------------------------------------------商品管理区-----------------------------------------------*/
 void selectGoodMenu() {
     loginOrNot();
-    //misjudgment("商品管理");
     int operation;
     while (true) {
         displayGoodMenu();
@@ -457,7 +456,6 @@ void displayGoodMenu() {
 
 void selGoodMenuWhitAdmin() {
     loginOrNot();
-    //misjudgment("商品管理");
     int operation;
     while (true) {
         disGoodMenuWhitAdmin();
