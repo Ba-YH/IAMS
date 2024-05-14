@@ -68,8 +68,7 @@ void findOpenGood();                                           //查看拍品
 void uploadGood();                                             //上传个人物品到拍品
 void batchAddGood();                                           //批量导入
 void userAddGood(string username, Good good);                  //给指定用户添加拍品，因为使用过多所以封装为函数
-bool isValidGood(const json &goodJson);                        //检查Good的保存格式是否正确
-bool isValidGoods(const json &goodsJson);                      //检查导入文件内容是否正确
+
 
 
 /*交易管理*/
@@ -510,7 +509,7 @@ void userAddGood(string username, Good g) {
     //第一件商品编号为用户名哈希，后面递增（确保唯一性）
     int goodId=stoi(to_string(hasher(username)).substr(0, 6));
     if(numberOfGoods.count(username)){
-        goodId+=numberOfGoods[username]-1;
+        goodId+=numberOfGoods[username];
     }
     numberOfGoods[username]++;
     //在添加物品时设置
@@ -857,38 +856,22 @@ void uploadGood() {
     }
 }
 
-bool isValidGood(const json &goodJson) {
-    //检查JSON格式是否正确
-    return goodJson.contains("物品名称") && goodJson.contains("物品描述") &&
-           goodJson.contains("物品价值") && goodJson.contains("物品分类")
-           && goodJson.contains("物品损坏程度");
-}
 
-bool isValidGoods(const json &goodsJson) {
-    if (!goodsJson.is_array()) {
-        return false;
-    }
-    for (const auto &goodJson: goodsJson) {
-        if (!isValidGood(goodJson)) {
-            return false;
-        }
-    }
-    return true;
-}
 
 void batchAddGood() {
-    string fileName = getInput<string>("请输入文件的绝对路径，注意只能是JSON格式文件：");
+    inputAgain:
+    string fileName = getInput<string>("请输入文件路径，注意只能是JSON格式文件：");
     size_t dotPos = fileName.find_last_of(".");
     //检查文件格式
     if (dotPos == string::npos || fileName.substr(dotPos + 1) != "json") {
         outputWarning("文件格式错误，请检查文件格式是否为JSON！\n");
-        return batchAddGood();
+        goto inputAgain;
     }
     //检查路径合法性
     ifstream inputfile(fileName);
     if (!inputfile.is_open()) {
         outputWarning("文件打开失败，请检查文件路径是否正确并重新输入！\n");
-        batchAddGood();
+        goto inputAgain;
     }
     //文件读取过程使用异常检测
     try {
@@ -899,13 +882,13 @@ void batchAddGood() {
             g.setUploader(currentUsername);
             userAddGood(currentUsername, g);
         }
-        inputfile.close();
-        outputHint("批量导入成功！");
     } catch (json::parse_error &ex) {
         //文件读取异常
         outputWarning("文件内容错误，请检查文件内容是否正确！\n");
         return;
     }
+    inputfile.close();
+    outputHint("批量导入成功！");
 }
 
 
