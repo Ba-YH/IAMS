@@ -332,18 +332,20 @@ void modifyPassword() {
 void usersList() {
     outputHint("\n所有用户信息如下：");
     string line;
-    for (int i = 1; i <= 90 - 11; i++) line += '-';
+    for (int i = 1; i <= 100 - 17; i++) line += '-';
     cout << line << "--\n";
     cout << "|";
-    cout << left << setw(30) << "用户名" << left << setw(30) << "密码" << left << setw(30) << "参与拍卖次数";
+    cout << left << setw(20) << "用户名" << left << setw(30) << "密码" << left << setw(25) << "参与拍卖次数";
+    cout << left << setw(25) << "拥有物品个数";
     cout << "|\n";
     cout << "|" << line << "|\n";
     for (auto [username, user]: users) {
         if (username == "admin") continue;
         cout << "|";
-        cout << left << setw(30) << append(username, 3);
+        cout << left << setw(20) << append(username, 3);
         cout << left << setw(30) << append(user.password, 2);
-        cout << left << setw(30) << append(to_string(user.countOfSessions), 6);
+        cout << left << setw(25) << append(to_string(user.countOfSessions), 6);
+        cout << left << setw(25) << append(to_string(tables[username].size()), 6);
         cout << "|\n";
     }
     cout << line << "--\n";
@@ -571,7 +573,7 @@ void removeGood() {
 
 void displayMyGoods(map<int, Good> needToDisplay) {
     if (needToDisplay.size() == 0) {
-        outputHint("当前还没有任何物品！");
+        outputHint("当前还没有任何物品！\n\n");
         return;
     }
     auto maxNameCount = 3;
@@ -964,7 +966,7 @@ void englandAuction(Good curGood) {
     unsigned seed = chrono::system_clock::now().time_since_epoch().count();
     default_random_engine rng(seed);
     shuffle(indexs.begin(), indexs.end(), rng);
-    set<string> abandonUsers,joinUsers;
+    set<string> abandonUsers, joinUsers;
     while (1) {
         for (int index: indexs) {
             inputAgain:
@@ -976,11 +978,10 @@ void englandAuction(Good curGood) {
             string price = getInput<string>(hint);
             if (price.empty()) {
                 abandonUsers.insert(username);
-            } else if(stod(price) < curNeed){
+            } else if (stod(price) < curNeed) {
                 outputWarning("当前出价低于最低出价，请重新出价或者放弃！\n");
                 goto inputAgain;
-            }
-            else{
+            } else {
                 abandonUsers.clear();
                 joinUsers.insert(username);
                 prePrice = stod(price);
@@ -992,7 +993,7 @@ void englandAuction(Good curGood) {
         }
     }
     next:
-    for(string username : joinUsers){
+    for (string username: joinUsers) {
         users[username].countOfSessions++;
     }
     //结束信息
@@ -1109,13 +1110,13 @@ void transaction(string uploader, string shootername, Good g, double price) {
     g.setUploader(shootername);
     userAddGood(shootername, g);
     //更新用户信息
-    int cnt1=users[shootername].countOfSessions;
-    int cnt=users[shootername].sucessRate*cnt1;
-    string category=g.getCategory();
+    int cnt1 = users[shootername].countOfSessions;
+    int cnt = users[shootername].sucessRate * cnt1;
+    string category = g.getCategory();
     //更新成功率，各类型拍品成功次数和成功率
-    users[shootername].sucessRate=(cnt+1.0)/cnt1;
+    users[shootername].sucessRate = (cnt + 1.0) / cnt1;
     users[shootername].difCategoryCnt[category]++;
-    users[shootername].difCategorySucessRate[category]=users[shootername].difCategoryCnt[category]/cnt1;
+    users[shootername].difCategorySucessRate[category] = users[shootername].difCategoryCnt[category] / cnt1;
     //交易记录
     Record record(g.getId(), price, shootername);
     records.push_back(record);
