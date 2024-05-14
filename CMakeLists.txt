@@ -1,7 +1,7 @@
 #指定cmake最小版本
 cmake_minimum_required(VERSION 3.27)
 #项目名称
-project(itemAuctionManagementSystem)
+project(IAMS)
 #C++标准
 set(CMAKE_CXX_STANDARD 17)
 
