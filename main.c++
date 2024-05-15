@@ -38,7 +38,7 @@ void inline loginOrNot();                                      //判断是否登
 void inline misjudgment(string operationDescribe);             //误触判断
 template<typename T>
 T getInput(const string &prompt, int war = 0);                 //提示输入的同时获取用户输入，war表示是否需要警告
-string secureInput(string prompt = "");                        //关闭输入回显的方式进行输入，默认提示为空
+string secureInput(string prompt = "");       //关闭输入回显的方式进行输入，默认提示为空
 
 /*用户管理*/
 void selectUserMenu();                                         //用户菜单项的选择与调用
@@ -163,34 +163,36 @@ string secureInput(const std::string prompt) {
 /*-------------------------------------------------用户管理区----------------------------------------------*/
 void selectUserMenu() {
     //misjudgment("账号管理");
-    int operation;
+    char operation;
     while (true) {
         displayUserMenu();
         //菜单项个数
         string menuItemNum = (currentUsername == "admin" ? "6" : "4");
-        operation = getInput<int>("请选择要执行的功能编号[1~" + menuItemNum + "]之间的整数：");
-        if (currentUsername != "admin" and (operation < 1 or operation > 4)) {
+        //operation = getInput<int>("请选择要执行的功能编号[1~" + menuItemNum + "]之间的整数：");
+        operation=_getch();
+        system("cls");
+        if (currentUsername != "admin" and (operation < '1' or operation > '4')) {
             outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！");
             continue;
         }
         switch (operation) {
-            case 1:
+            case '1':
                 login();
                 break;
-            case 2:
+            case '2':
                 registerUser();
                 break;
-            case 3:
+            case '3':
                 modifyPassword();
                 break;
-            case 4:
+            case '4':
                 if (currentUsername == "admin") banningUser();
                 else return;
                 break;
-            case 5:
+            case '5':
                 usersList();
                 break;
-            case 6:
+            case '6':
                 return;
             default:
                 outputWarning("输入错误，请检查输入是否是[1~6]之间的整数！\n");
@@ -245,7 +247,7 @@ void login() {
         string registerOrNot = getInput<string>("用户名未找到！是否直接使用此用户名进行注册？(y/n)", 1);
         if (registerOrNot == "y" || registerOrNot.empty()) {
             inputAgain:
-            password = getInput<string>(prompt);
+            password = (prompt);
             string passwordAgain = getInput<string>("再次确认密码：");
             if (passwordAgain == password) {
                 //添加用户,计算新的用户ID->添加到用户ID表->添加到用户表
@@ -398,33 +400,34 @@ void banningUser() {
 /*------------------------------------------------物品管理区-----------------------------------------------*/
 void selectGoodMenu() {
     loginOrNot();
-    int operation;
+    char operation;
     while (true) {
         displayGoodMenu();
-        operation = getInput<int>("请选择要输入的编号[1~8]之间的整数：");
+        operation=_getch();
+        system("cls");
         switch (operation) {
-            case 1:
+            case '1':
                 addGood();
                 break;
-            case 2:
+            case '2':
                 batchAddGood();
                 break;
-            case 3:
+            case '3':
                 deleteGood();
                 break;
-            case 4:
+            case '4':
                 modifyGood();
                 break;
-            case 5:
+            case '5':
                 findGood();
                 break;
-            case 6:
+            case '6':
                 findOpenGood();
                 break;
-            case 7:
+            case '7':
                 uploadGood();
                 break;
-            case 8:
+            case '8':
                 return;
             default:
                 outputWarning("输入错误，请检查输入是否是[1~8]之间的整数！\n");
@@ -458,21 +461,22 @@ void displayGoodMenu() {
 
 void selGoodMenuWhitAdmin() {
     loginOrNot();
-    int operation;
+    char operation;
     while (true) {
         disGoodMenuWhitAdmin();
-        operation = getInput<int>("请选择要输入的编号[1~4]之间的整数：");
+        operation=_getch();
+        system("cls");
         switch (operation) {
-            case 1:
+            case '1':
                 removeGood();
                 break;
-            case 2:
+            case '2':
                 modifyGood();
                 break;
-            case 3:
+            case '3':
                 findOpenGood();
                 break;
-            case 4:
+            case '4':
                 return;
             default:
                 outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
@@ -899,18 +903,19 @@ void batchAddGood() {
 /*-------------------------------------------------交易管理区----------------------------------------------*/
 void selectRecordMenu() {
     //misjudgment("交易管理");
-    int operation;
+    char operation;
     while (true) {
         displayRecordMenu();
-        operation = getInput<int>("请选择要输入的编号[1~3]之间的整数：");
+        operation=_getch();
+        system("cls");
         switch (operation) {
-            case 1:
+            case '1':
                 displayRecords();
                 break;
-            case 2:
+            case '2':
                 auction();
                 break;
-            case 3:
+            case '3':
                 return;
             default:
                 outputWarning("输入错误，请检查输入是否是[1~3]之间的整数！");
@@ -1345,26 +1350,27 @@ void systemIntroduction() {
 }
 
 void selectMainMenu() {
-    int operation;
+    char operation;
     while (true) {
         displayMainMenu();
-        operation = getInput<int>("请选择要输入的编号[1~5]之间的整数：");
+        operation=_getch();
+        system("cls");
         switch (operation) {
-            case 1:
+            case '1':
                 selectUserMenu();
                 break;
-            case 2:
+            case '2':
                 if (currentUsername == "admin") selGoodMenuWhitAdmin();
                 else selectGoodMenu();
                 break;
-            case 3:
+            case '3':
                 if (currentUsername == "admin") selectRecordMenu();
                 else displayRecords();
                 break;
-            case 4:
+            case '4':
                 systemIntroduction();
                 break;
-            case 5:
+            case '5':
                 exitTheSystem();
                 break;
             default:
