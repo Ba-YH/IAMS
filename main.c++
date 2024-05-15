@@ -36,9 +36,11 @@ string recordsfilename = "../data/records.json";               //日志保存位
 /*辅助功能函数*/
 void inline loginOrNot();                                      //判断是否登录
 void inline misjudgment(string operationDescribe);             //误触判断
+void inline pressAnyKey();
 template<typename T>
 T getInput(const string &prompt, int war = 0);                 //提示输入的同时获取用户输入，war表示是否需要警告
 string secureInput(string prompt = "");       //关闭输入回显的方式进行输入，默认提示为空
+
 
 /*用户管理*/
 void selectUserMenu();                                         //用户菜单项的选择与调用
@@ -47,8 +49,8 @@ void login();                                                  //登录账号
 void registerUser();                                           //注册账号
 void modifyPassword();                                         //修改密码
 void banningUser();
-
 void usersList();
+
 
 /*物品管理*/
 void selectGoodMenu();                                         //拍卖品菜单项的选择与调用
@@ -108,11 +110,18 @@ void inline misjudgment(string operationDescribe) {
 void inline loginOrNot() {
     if (loginStatus == false) {
         outputWarning("您还没登录，执行此操作前请先登录！");
+        pressAnyKey();
         selectMainMenu();
         return;
     }
 }
 
+void inline pressAnyKey() {
+    outputHint("\n\n按任意键继续...");
+    char ch=_getch();
+    system("cls");
+    return;
+}
 template<typename T>
 T getInput(const string &prompt, int war) {
     if (war == 0) cout << prompt;
@@ -233,13 +242,17 @@ void login() {
     if (loginStatus) {
         string switchAccounts = getInput<string>("当前账号" + currentUsername + "已登录！是否需要切换账号？(y/n)", 1);
         if (switchAccounts == "y" || switchAccounts.empty());
-        else return;
+        else{
+            pressAnyKey();
+            return;
+        }
     }
     logInAgain:
     username = getInput<string>("请输入用户名：");
     string prompt = append("请输入密", 1) + "码：";
     if (users.count(username) and users[username].isAvailable == false) {
-        outputWarning("当前用户已被封禁，限制登录！\n如果您对本次处罚有疑问，请联系管理员！\n");
+        outputWarning("当前用户已被封禁，限制登录！\n如果您对本次处罚有疑问，请联系管理员！\n\n");
+        pressAnyKey();
         return;
     }
     if (!users.count(username)) {
@@ -267,7 +280,7 @@ void login() {
         string correctPassword = users[username].password;
         int numberOfAttempts = 0;
         while (true) {
-            password = getInput<string>(prompt);
+            password = secureInput(prompt);
             if (password == correctPassword) {
                 currentUsername = username;
                 outputHint("登录成功！");
@@ -288,6 +301,7 @@ void login() {
             }
         }
     }
+    pressAnyKey();
 }
 
 void registerUser() {
@@ -307,11 +321,13 @@ void registerUser() {
         outputWarning("两次输入密码不一致，请重新输入！\n");
         goto inputAgain;
     }
+    pressAnyKey();
 }
 
 void modifyPassword() {
     if (loginStatus == false) {
-        outputWarning("您还没有登录！");
+        outputWarning("您还没有登录！\n");
+        pressAnyKey();
         return;
     }
     inputAgain:
@@ -329,6 +345,7 @@ void modifyPassword() {
         outputWarning("两次输入密码不一致，请重新输入！\n");
         modifyPassword();
     }
+    pressAnyKey();
 }
 
 void usersList() {
@@ -350,7 +367,8 @@ void usersList() {
         cout << left << setw(25) << append(to_string(tables[username].size()), 6);
         cout << "|\n";
     }
-    cout << line << "--\n";
+    cout << line << "--\n\n\n";
+    pressAnyKey();
 }
 
 void banningUser() {
@@ -395,6 +413,7 @@ void banningUser() {
     } else {
         outputWarning("没有编号为［" + selectUserId + "］的用户\n");
     }
+    pressAnyKey();
 }
 
 /*------------------------------------------------物品管理区-----------------------------------------------*/
@@ -549,14 +568,7 @@ void addGood() {
     userAddGood(currentUsername, good);
     outputHint("物品信息添加成功！");
 
-    while (true) {
-        string continueOrNot = getInput<string>("是否需要继续添加物品？(y/n)");
-        if (continueOrNot == "y" || continueOrNot.empty()) {
-            addGood();
-        } else {
-            break;
-        }
-    }
+    pressAnyKey();
 }
 
 void removeGood() {
@@ -578,6 +590,7 @@ void removeGood() {
 void displayMyGoods(map<int, Good> needToDisplay) {
     if (needToDisplay.size() == 0) {
         outputHint("当前还没有任何物品！\n\n");
+        pressAnyKey();
         return;
     }
     auto maxNameCount = 3;
@@ -617,7 +630,8 @@ void deleteGood() {
     map<int, Good> currentGoods = tables[currentUsername];
     //判断是否有物品
     if (currentGoods.size() == 0) {
-        outputWarning("当前没有物品可以删除，请先添加物品！");
+        outputWarning("当前没有物品可以删除，请先添加物品！\n\n");
+        pressAnyKey();
         return;
     }
 
@@ -625,6 +639,7 @@ void deleteGood() {
     currentGoods = tables[currentUsername];
     if (currentGoods.size() == 0) {
         outputWarning("您已删除完全部物品！");
+        pressAnyKey();
         return;
     }
 
@@ -640,14 +655,7 @@ void deleteGood() {
         goto inputAgain;
     }
 
-    while (true) {
-        string continueOrNot = getInput<string>("是否需要继续删除物品？(y/n)");
-        if (continueOrNot == "y" || continueOrNot.empty()) {
-            goto delAgain;
-        } else {
-            break;
-        }
-    }
+    pressAnyKey();
 }
 
 void modifyGood() {
@@ -655,7 +663,8 @@ void modifyGood() {
 
     //检查是否有物品
     if (currentGoods.size() == 0) {
-        cout << "当前没有物品可以修改，请先添加物品！";
+        cout << "当前没有物品可以修改，请先添加物品！\n\n";
+        pressAnyKey();
         return;
     }
 
@@ -701,26 +710,21 @@ void modifyGood() {
     tables[currentUsername][modifyId] = selGood;
     outputHint("编号为［" + to_string(modifyId) + "］的物品已完成修改！\n");
 
-    while (true) {
-        string continueOrNot = getInput<string>("是否需要继续修改物品？(y/n)");
-        if (continueOrNot == "y" || continueOrNot.empty()) {
-            goto modifyAgain;
-        } else {
-            break;
-        }
-    }
+    pressAnyKey();
 }
 
 void getGoodById(map<int, Good> goods) {
     int selId = getInput<int>("请输入物品编号:");
     if (!goods.count(selId)) {
-        outputWarning("没有查询到该物品，如果忘记编号建议使用[按照类型/名称查询]");
+        outputWarning("没有查询到该物品，如果忘记编号建议使用[按照类型/名称查询]\n\n");
+        pressAnyKey();
         return;
     }
     map<int, Good> selGoods;
     selGoods[selId] = goods[selId];
     outputHint("\n编号为" + ("[" + to_string(selId) + "]") + "的物品信息如下：");
     displayMyGoods(selGoods);
+    pressAnyKey();
 }
 
 void getGoodByCategory(map<int, Good> goods) {
@@ -746,11 +750,13 @@ void getGoodByCategory(map<int, Good> goods) {
         }
     }
     if (selGoods.size() == 0) {
-        outputWarning("没有找到类别为［" + specifyCatagory + "］的物品！\n");
+        outputWarning("没有找到类别为［" + specifyCatagory + "］的物品！\n\n\n");
+        pressAnyKey();
         return;
     }
     outputHint("\n［" + specifyCatagory + "］类的物品信息如下：");
     displayMyGoods(selGoods);
+    pressAnyKey();
 }
 
 void getGoodByName(map<int, Good> goods) {
@@ -762,11 +768,13 @@ void getGoodByName(map<int, Good> goods) {
         }
     }
     if (selGoods.size() == 0) {
-        outputWarning("没有找到名为［" + specifyGoodName + "］的物品！");
+        outputWarning("没有找到名为［" + specifyGoodName + "］的物品！\n\n\n");
+        pressAnyKey();
         return;
     }
     outputHint("\n名为［" + specifyGoodName + "］的物品信息如下：");
     displayMyGoods(selGoods);
+    pressAnyKey();
 }
 
 void findGood() {
@@ -790,6 +798,7 @@ void findGood() {
         case 4:
             outputHint("\n所有物品的信息如下：");
             displayMyGoods(goods);
+            pressAnyKey();
             break;
         default:
             outputWarning("输入有误，检查输入是否为[1,4]之间的整数！\n");
@@ -819,6 +828,7 @@ void findOpenGood() {
         case 4:
             outputHint("\n所有拍品的信息如下：");
             displayMyGoods(goods);
+            pressAnyKey();
             break;
         default:
             outputWarning("输入有误，检查输入是否为[1,4]之间的整数！");
@@ -830,7 +840,8 @@ void uploadGood() {
     map<int, Good> currentGoods = tables[currentUsername];
     //判断是否有物品
     if (currentGoods.size() == 0) {
-        outputWarning("当前没有物品可以上传，请先添加物品！\n");
+        outputWarning("当前没有物品可以上传，请先添加物品！\n\n");
+        pressAnyKey();
         return;
     }
 
@@ -838,7 +849,8 @@ void uploadGood() {
     uploadAgain:
     currentGoods = tables[currentUsername];
     if (currentGoods.size() == 0) {
-        outputWarning("您已上传完全部物品！\n");
+        outputWarning("您已上传完全部物品！\n\n");
+        pressAnyKey();
         return;
     }
 
@@ -893,6 +905,7 @@ void batchAddGood() {
     } catch (json::parse_error &ex) {
         //文件读取异常
         outputWarning("文件内容错误，请检查文件内容是否正确！\n");
+        pressAnyKey();
         return;
     }
     inputfile.close();
@@ -1008,6 +1021,7 @@ void englandAuction(Good curGood) {
     } else {
         transaction(uploder, preUsername, curGood, prePrice);
     }
+    pressAnyKey();
 }
 
 void sealedBiddingAuction(Good curGood) {
@@ -1080,6 +1094,7 @@ void sealedBiddingAuction(Good curGood) {
     } else {
         outputWarning("没有找到竞买记录，竞买失败！");
     }
+    pressAnyKey();
 }
 
 void auction() {
@@ -1203,7 +1218,8 @@ void displayRecords() {
         else cout << oss.str();
         cout << "|\n";
     }
-    cout << shortline << "--\n";
+    cout << shortline << "--\n\n\n";
+    pressAnyKey();
 }
 
 /*-------------------------------------------------文件操作区----------------------------------------------*/
@@ -1345,8 +1361,9 @@ void systemIntroduction() {
     cout<<"本项目已在GitHub上开开源：";
     cout<<"\033[33m"<<"https://github.com/Ba-YH/IAMS\n"<<"\033[0m";
     cout<<"如果你对项目使用有任何疑问，请在GitHub中查看!\n";
-    cout<<"如果你发现该项目的任何问题或是需求新的功能，欢迎您在issues提出!\n";
+    cout<<"如果你发现该项目的任何问题或是需求新的功能，欢迎您在issues提出!\n\n\n";
     // @formatter:on   开启格式化
+    pressAnyKey();
 }
 
 void selectMainMenu() {
