@@ -972,11 +972,11 @@ void getGoodByName(map<int, Good> goods) {
     pressAnyKey();
 }
 
-void findOpen() {
+void findGood() {
     map<int, Good> goods = tables[currentUsername];
     string line;
     for (int i = 1; i <= 20 - 6; i++) line += "-";
-    int pos=1;
+    int pos = 1;
     auto put = [&](string value, int id, int width) -> string {
         ostringstream os;
         if (id == pos) os << "\033[33m" << left << setw(width) << value << "\033[0m";
@@ -985,9 +985,9 @@ void findOpen() {
     };
     auto dis = [&]() -> void {
         cout << line << "--\n";
-        cout << "|" << put(append("按编号查找",1), 1, 20) << "|\n";
-        cout << "|" << put(append("按名称查找",1), 2, 20) << "|\n";
-        cout << "|" << put(append("按类别查找",1), 3, 20) << "|\n";
+        cout << "|" << put(append("按编号查找", 1), 1, 20) << "|\n";
+        cout << "|" << put(append("按名称查找", 1), 2, 20) << "|\n";
+        cout << "|" << put(append("按类别查找", 1), 3, 20) << "|\n";
         cout << "|" << put("查看所有拍品", 4, 20) << "|\n";
         cout << line << "--\n";
     };
@@ -1029,7 +1029,7 @@ void findOpenGood() {
     map<int, Good> goods = tables["admin"];
     string line;
     for (int i = 1; i <= 20 - 6; i++) line += "-";
-    int pos=1;
+    int pos = 1;
     auto put = [&](string value, int id, int width) -> string {
         ostringstream os;
         if (id == pos) os << "\033[33m" << left << setw(width) << value << "\033[0m";
@@ -1038,9 +1038,9 @@ void findOpenGood() {
     };
     auto dis = [&]() -> void {
         cout << line << "--\n";
-        cout << "|" << put(append("按编号查找",1), 1, 20) << "|\n";
-        cout << "|" << put(append("按名称查找",1), 2, 20) << "|\n";
-        cout << "|" << put(append("按类别查找",1), 3, 20) << "|\n";
+        cout << "|" << put(append("按编号查找", 1), 1, 20) << "|\n";
+        cout << "|" << put(append("按名称查找", 1), 2, 20) << "|\n";
+        cout << "|" << put(append("按类别查找", 1), 3, 20) << "|\n";
         cout << "|" << put("查看所有拍品", 4, 20) << "|\n";
         cout << line << "--\n";
     };
@@ -1380,17 +1380,45 @@ void auction() {
     Good currentItem = openGoods[selId];
     toString(currentItem);
 
-    cout << "当前拍卖系统的竞拍方式如下：\n";
-    cout << "\t1. 英格兰式拍卖\n";
-    cout << "\t2. 密封招标式拍卖\n";
-    selId = getInput<int>("请选择竞拍方式：");
-    if (selId == 1) {
-        englandAuction(currentItem);
-    } else if (selId == 2) {
-        sealedBiddingAuction(currentItem);
-    } else {
-        outputWarning("输入有误，请检查输入！\n");
+    string line;
+    for (int i = 1; i <= 20 - 6; i++) line += "-";
+    int pos = 1;
+    auto put = [&](string value, int id, int width) -> string {
+        ostringstream os;
+        if (id == pos) os << "\033[33m" << left << setw(width) << value << "\033[0m";
+        else os << left << setw(width) << value;
+        return os.str();
+    };
+    auto dis = [&]() -> void {
+        cout << line << "--\n";
+        cout << "|" << put(append("英格兰式拍卖", 1), 1, 20) << "|\n";
+        cout << "|" << put("密封招标式拍卖", 2, 20) << "|\n";
+        cout << line << "--\n";
+    };
+    while (1) {
+        dis();
+        char c = _getch();
+        system("cls");
+        switch (c) {
+            case 'w':
+                if (pos != 1) pos--;
+                break;
+            case 's':
+                if (pos != 2) pos++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        englandAuction(currentItem);
+                        break;
+                    case 2:
+                        sealedBiddingAuction(currentItem);
+                        break;
+                }
+                goto out;
+        }
     }
+    out:;
 }
 
 void transaction(string uploader, string shootername, Good g, double price) {
