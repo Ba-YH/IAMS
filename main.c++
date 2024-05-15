@@ -37,6 +37,7 @@ string recordsfilename = "../data/records.json";               //日志保存位
 void inline loginOrNot();                                      //判断是否登录
 void inline misjudgment(string operationDescribe);             //误触判断
 void inline pressAnyKey();
+
 template<typename T>
 T getInput(const string &prompt, int war = 0);                 //提示输入的同时获取用户输入，war表示是否需要警告
 string secureInput(string prompt = "");       //关闭输入回显的方式进行输入，默认提示为空
@@ -44,19 +45,21 @@ string secureInput(string prompt = "");       //关闭输入回显的方式进�
 
 /*用户管理*/
 void selectUserMenu();                                         //用户菜单项的选择与调用
-void displayUserMenu();                                        //展示用户功能面板
+void displayUserMenu(int pos);                                 //展示用户功能面板
+void selUserMenuWithAdmin();                                   //管理员用户菜单项的选择与调用
+void disUserMenuWithAdmin(int pos);                             //展示管理员的用户功能面板
 void login();                                                  //登录账号
 void registerUser();                                           //注册账号
 void modifyPassword();                                         //修改密码
-void banningUser();
-void usersList();
+void banningUser();                                            //封禁用户
+void usersList();                                              //用户信息
 
 
 /*物品管理*/
 void selectGoodMenu();                                         //拍卖品菜单项的选择与调用
-void displayGoodMenu();                                        //展示拍卖品功能面板
-void selGoodMenuWhitAdmin();                                   //管理员的拍卖品功能面板
-void disGoodMenuWhitAdmin();                                   //管理员的展示面板
+void displayGoodMenu(int pos);                                 //展示拍卖品功能面板
+void selGoodMenuWithAdmin();                                   //管理员的拍卖品功能面板
+void disGoodMenuWithAdmin(int pos);                            //管理员的展示面板
 void addGood();                                                //添加拍卖品
 void removeGood();                                             //下架拍品
 void deleteGood();                                             //删除拍卖品
@@ -74,7 +77,7 @@ void userAddGood(string username, Good good);                  //给指定用户
 
 
 /*交易管理*/
-void displayRecordMenu();                                      //展示交易记录功能面板
+void displayRecordMenu(int pos);                               //展示交易记录功能面板
 void selectRecordMenu();                                       //交易记录菜单项的选择与调用
 void auction();                                                //模拟拍卖
 void displayRecords();                                         //展示交易记录
@@ -92,7 +95,7 @@ void saveRecords();                                            //保存记录数
 
 /*首页*/
 void systemIntroduction();                                     //系统介绍
-void displayMainMenu();                                        //展示功能面板
+void displayMainMenu(int pos);                                 //展示功能面板
 void selectMainMenu();                                         //主菜单项的选择与调用
 void exitTheSystem();                                          //退出系统
 
@@ -118,10 +121,11 @@ void inline loginOrNot() {
 
 void inline pressAnyKey() {
     outputHint("\n\n按任意键继续...");
-    char ch=_getch();
+    char ch = _getch();
     system("cls");
     return;
 }
+
 template<typename T>
 T getInput(const string &prompt, int war) {
     if (war == 0) cout << prompt;
@@ -171,19 +175,13 @@ string secureInput(const std::string prompt) {
 
 /*-------------------------------------------------用户管理区----------------------------------------------*/
 void selectUserMenu() {
-    //misjudgment("账号管理");
+    int x = 1, y = 1;
     char operation;
     while (true) {
-        displayUserMenu();
-        //菜单项个数
-        string menuItemNum = (currentUsername == "admin" ? "6" : "4");
-        //operation = getInput<int>("请选择要执行的功能编号[1~" + menuItemNum + "]之间的整数：");
-        operation=_getch();
+        int pos = (x - 1) * 2 + y;
+        displayUserMenu(pos);
+        operation = _getch();
         system("cls");
-        if (currentUsername != "admin" and (operation < '1' or operation > '4')) {
-            outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！");
-            continue;
-        }
         switch (operation) {
             case '1':
                 login();
@@ -195,22 +193,42 @@ void selectUserMenu() {
                 modifyPassword();
                 break;
             case '4':
-                if (currentUsername == "admin") banningUser();
-                else return;
-                break;
-            case '5':
-                usersList();
-                break;
-            case '6':
                 return;
+            case 'w':
+                if (x != 1) x--;
+                break;
+            case 's':
+                if (x != 2) x++;
+                break;
+            case 'a':
+                if (y != 1) y--;
+                break;
+            case 'd':
+                if (y != 2) y++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        login();
+                        break;
+                    case 2:
+                        registerUser();
+                        break;
+                    case 3:
+                        modifyPassword();
+                        break;
+                    case 4:
+                        return;
+                }
+                break;
             default:
-                outputWarning("输入错误，请检查输入是否是[1~6]之间的整数！\n");
+                outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
         }
-        //saveUsers();
+        //saveGoods();
     }
 }
 
-void displayUserMenu() {
+void displayUserMenu(int pos) {
     //@formatter:off
     cout << "\n\n\n\n";
     string line,shortline;
@@ -224,14 +242,109 @@ void displayUserMenu() {
         cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
     }
     cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
+    auto put=[&](string value,int id,int width)->string{
+        ostringstream os;
+        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        else  os<<setw(30)<<value;
+        return os.str();
+    };
     string loginOrRegister = loginStatus ? "1. 切换账号" : "1. 用户登录";
-    cout<<"|"<<right<<setw(30)<<loginOrRegister<<right<<setw(30)<<"2. 用户注册"<<setw(20)<<""<<"|\n";
-    if (currentUsername != "admin")
-    cout<<"|"<<right<<setw(30)<<"3. 修改密码"<<right<<setw(30)<<"4. 返回首页"<<setw(20)<<""<<"|\n";
-    else{
-    cout<<"|"<<right<<setw(30)<<"3. 修改密码"<<right<<setw(30)<<"4. 封禁用户"<<setw(20)<<""<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"5. 用户信息"<<right<<setw(30)<<"6. 返回首页"<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put(loginOrRegister,1,30)<<right<<put("2. 用户注册",2,30)<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("3. 修改密码",3,30)<<right<<put("4. 返回首页",4,30)<<setw(20)<<""<<"|\n";
+    cout<<line << "--\n";
+    //@formatter:on
+}
+
+void selUserMenuWithAdmin() {
+    int x = 1, y = 1;
+    char operation;
+    while (true) {
+        int pos = (x - 1) * 2 + y;
+        disUserMenuWithAdmin(pos);
+        operation = _getch();
+        system("cls");
+        switch (operation) {
+            case '1':
+                login();
+                break;
+            case '2':
+                registerUser();
+                break;
+            case '3':
+                modifyPassword();
+                break;
+            case '4':
+                banningUser();
+                break;
+            case '5':
+                usersList();
+                break;
+            case '6':
+                return;
+            case 'w':
+                if (x != 1) x--;
+                break;
+            case 's':
+                if (x != 2) x++;
+                break;
+            case 'a':
+                if (y != 1) y--;
+                break;
+            case 'd':
+                if (y != 2) y++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        login();
+                        break;
+                    case 2:
+                        registerUser();
+                        break;
+                    case 3:
+                        modifyPassword();
+                        break;
+                    case 4:
+                        banningUser();
+                        break;
+                    case 5:
+                        usersList();
+                        break;
+                    case 6:
+                        return;
+                }
+                break;
+            default:
+                outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
+        }
+        //saveGoods();
     }
+}
+
+void disUserMenuWithAdmin(int pos) {
+    //@formatter:off
+    cout << "\n\n\n\n";
+    string line,shortline;
+    string value="用户管理：";
+    for(int i=1; i<=25; i++) shortline+='-';
+    for(int i=1; i<=72; i++) line += '-';
+    cout<<shortline<<"欢迎使用物品竞拍管理系统"<<shortline<<"\n";
+    if(loginStatus){
+        cout<<"|"<<value<<right<<setw(80-value.size())<<(currentUsername+"已登录")<<"|\n";
+    }else{
+        cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
+    }
+    cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
+    auto put=[&](string value,int id,int width)->string{
+        ostringstream os;
+        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        else  os<<setw(30)<<value;
+        return os.str();
+    };
+    string loginOrRegister = loginStatus ? "1. 切换账号" : "1. 用户登录";
+    cout<<"|"<<right<<put(loginOrRegister,1,30)<<right<<put("2. 用户注册",2,30)<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("3. 修改密码",3,30)<<right<<put("4. 封禁用户",4,30)<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("5. 用户信息",5,30)<<right<<put("6. 返回首页",6,30)<<setw(20)<<""<<"|\n";
     cout<<line << "--\n";
     //@formatter:on
 }
@@ -242,7 +355,7 @@ void login() {
     if (loginStatus) {
         string switchAccounts = getInput<string>("当前账号" + currentUsername + "已登录！是否需要切换账号？(y/n)", 1);
         if (switchAccounts == "y" || switchAccounts.empty());
-        else{
+        else {
             pressAnyKey();
             return;
         }
@@ -420,9 +533,11 @@ void banningUser() {
 void selectGoodMenu() {
     loginOrNot();
     char operation;
+    int x = 1, y = 1;
     while (true) {
-        displayGoodMenu();
-        operation=_getch();
+        int pos = (x - 1) * y;
+        displayGoodMenu(pos);
+        operation = _getch();
         system("cls");
         switch (operation) {
             case '1':
@@ -448,6 +563,45 @@ void selectGoodMenu() {
                 break;
             case '8':
                 return;
+            case 'w':
+                if (x != 1) x--;
+                break;
+            case 's':
+                if (x != 4) x++;
+                break;
+            case 'a':
+                if (y != 1) y--;
+                break;
+            case 'd':
+                if (y != 2) y++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        addGood();
+                        break;
+                    case 2:
+                        batchAddGood();
+                        break;
+                    case 3:
+                        deleteGood();
+                        break;
+                    case 4:
+                        modifyGood();
+                        break;
+                    case 5:
+                        findGood();
+                        break;
+                    case 6:
+                        findOpenGood();
+                        break;
+                    case 7:
+                        uploadGood();
+                        break;
+                    case 8:
+                        return;
+                }
+                break;
             default:
                 outputWarning("输入错误，请检查输入是否是[1~8]之间的整数！\n");
         }
@@ -456,7 +610,7 @@ void selectGoodMenu() {
 
 }
 
-void displayGoodMenu() {
+void displayGoodMenu(int pos) {
     //@formatter:off
     cout << "\n\n\n\n";
     string line,shortline;
@@ -469,21 +623,29 @@ void displayGoodMenu() {
     }else{
         cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
     }
+    auto put=[&](string value,int id,int width)->string{
+        ostringstream os;
+        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        else  os<<setw(30)<<value;
+        return os.str();
+    };
     cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"1. 添加物品"<<right<<setw(30)<<"2. 批量导入"<<setw(20)<<""<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"3. 删除物品"<<right<<setw(30)<<"4. 修改物品"<<setw(20)<<""<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"5. 查看物品"<<right<<setw(30)<<"6. 查询拍品"<<setw(20)<<""<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"7. 上传拍品"<<right<<setw(30)<<"8. 返回首页"<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("1. 添加物品",1,30)<<right<<put("2. 批量导入",2,30)<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("3. 删除物品",3,30)<<right<<put("4. 修改物品",4,30)<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("5. 查看物品",5,30)<<right<<put("6. 查询拍品",6,30)<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("7. 上传拍品",7,30)<<right<<put("8. 返回首页",8,30)<<setw(20)<<""<<"|\n";
     cout<<line << "--\n";
     //@formatter:on
 }
 
-void selGoodMenuWhitAdmin() {
+void selGoodMenuWithAdmin() {
     loginOrNot();
+    int x = 1, y = 1;
     char operation;
     while (true) {
-        disGoodMenuWhitAdmin();
-        operation=_getch();
+        int pos = (x - 1) * 2 + y;
+        disGoodMenuWithAdmin(pos);
+        operation = _getch();
         system("cls");
         switch (operation) {
             case '1':
@@ -497,6 +659,33 @@ void selGoodMenuWhitAdmin() {
                 break;
             case '4':
                 return;
+            case 'w':
+                if (x != 1) x--;
+                break;
+            case 's':
+                if (x != 2) x++;
+                break;
+            case 'a':
+                if (y != 1) y--;
+                break;
+            case 'd':
+                if (y != 2) y++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        removeGood();
+                        break;
+                    case 2:
+                        modifyGood();
+                        break;
+                    case 3:
+                        findOpenGood();
+                        break;
+                    case 4:
+                        return;
+                }
+                break;
             default:
                 outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
         }
@@ -505,7 +694,7 @@ void selGoodMenuWhitAdmin() {
 
 }
 
-void disGoodMenuWhitAdmin() {
+void disGoodMenuWithAdmin(int pos) {
     //@formatter:off
     cout << "\n\n\n\n";
     string line,shortline;
@@ -518,9 +707,15 @@ void disGoodMenuWhitAdmin() {
     }else{
         cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
     }
+        auto put=[&](string value,int id,int width)->string{
+        ostringstream os;
+        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        else  os<<setw(30)<<value;
+        return os.str();
+    };
     cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"1. 下架物品"<<right<<setw(30)<<"2. 修改物品"<<setw(20)<<""<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"3. 查询拍品"<<right<<setw(30)<<"4. 返回首页"<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("1. 下架物品",1,30)<<right<<put("2. 修改物品",2,30)<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("3. 查询拍品",3,30)<<right<<put("4. 返回首页",4,30)<<setw(20)<<""<<"|\n";
     cout<<line << "--\n";
     //@formatter:on
 }
@@ -917,9 +1112,11 @@ void batchAddGood() {
 void selectRecordMenu() {
     //misjudgment("交易管理");
     char operation;
+    int x = 1, y = 1;
     while (true) {
-        displayRecordMenu();
-        operation=_getch();
+        int pos = (x - 1) * 2 + y;
+        displayRecordMenu(pos);
+        operation = _getch();
         system("cls");
         switch (operation) {
             case '1':
@@ -930,14 +1127,38 @@ void selectRecordMenu() {
                 break;
             case '3':
                 return;
+            case 'w':
+                if (x != 1) x--;
+                break;
+            case 's':
+                if (x != 2) x++;
+                break;
+            case 'a':
+                if (y != 1) y--;
+                break;
+            case 'd':
+                if (x != 2 and y != 2) y++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        displayRecords();
+                        break;
+                    case 2:
+                        auction();
+                        break;
+                    case 3:
+                        return;
+                }
+                break;
             default:
-                outputWarning("输入错误，请检查输入是否是[1~3]之间的整数！");
+                outputWarning("输入错误，请重新输入！\n");
         }
         //saveRecords();
     }
 }
 
-void displayRecordMenu() {
+void displayRecordMenu(int pos) {
     //@formatter:off
     cout << "\n\n\n\n";
     string line,shortline;
@@ -950,9 +1171,15 @@ void displayRecordMenu() {
     }else{
         cout<<"|"<<value<<right<<setw(80-value.size())<<("未登录")<<"|\n";
     }
+    auto put=[&](string value,int id,int width)->string{
+        ostringstream os;
+        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        else  os<<setw(30)<<value;
+        return os.str();
+    };
     cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"1. 交易记录"<< right<<setw(30)<<"2. 开始竞拍"   <<right<<setw(20)<<""<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"3. 返回首页"<< right<<setw(30)<<append("", 4) <<right<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("1. 交易记录",1,30)<<right<<put("2. 开始竞拍",2,30)<<right<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("3. 返回首页",3,30)<<right<<put(append("", 4),0,30)<<right<<setw(20)<<""<<"|\n";
     cout << line << "--\n";
     //@formatter:on
 }
@@ -1310,7 +1537,7 @@ void saveRecords() {
 }
 
 /*-------------------------------------------------首页----------------------------------------------------*/
-void displayMainMenu() {
+void displayMainMenu(int pos) {
     //@formatter:off
     cout << "\n\n\n\n";
     string line,shortline;
@@ -1324,10 +1551,16 @@ void displayMainMenu() {
         cout<<"|"<<value<<right<<setw(80-value.size()-2)<<("未登录")<<"|\n";
     }
     string recordsValue=currentUsername=="admin"?"3. 交易管理":"3. 交易记录";
+    auto put=[&](string value,int id,int width)->string{
+        ostringstream os;
+        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        else  os<<setw(30)<<value;
+        return os.str();
+    };
     cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"1. 用户管理"<<right<<setw(30)<<"2. 物品管理" <<right<<setw(20)<<""<<"|\n";
-    cout<<"|"<<right<<setw(30)<<recordsValue<<right<<setw(30)<<"4. 关于系统" <<right<<setw(20)<<""<<"|\n";
-    cout<<"|"<<right<<setw(30)<<"5. 退出系统"<<right<<setw(30)<<append("",4) <<right<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("1. 用户管理",1,30)<<right<<put("2. 物品管理",2,30)<<right<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put(recordsValue,3,30)<<right<<put("4. 关于系统",4,30)<<right<<setw(20)<<""<<"|\n";
+    cout<<"|"<<right<<put("5. 退出系统",5,30)<<right<<put(append("",4),0,30)<<right<<setw(20)<<""<<"|\n";
     cout << line << "--\n";
     //@formatter:on
 }
@@ -1368,16 +1601,19 @@ void systemIntroduction() {
 
 void selectMainMenu() {
     char operation;
+    int x = 1, y = 1;
     while (true) {
-        displayMainMenu();
-        operation=_getch();
+        int pos = (x - 1) * 2 + y;
+        displayMainMenu(pos);
+        operation = _getch();
         system("cls");
         switch (operation) {
             case '1':
-                selectUserMenu();
+                if (currentUsername == "admin") selUserMenuWithAdmin();
+                else selectUserMenu();
                 break;
             case '2':
-                if (currentUsername == "admin") selGoodMenuWhitAdmin();
+                if (currentUsername == "admin") selGoodMenuWithAdmin();
                 else selectGoodMenu();
                 break;
             case '3':
@@ -1389,6 +1625,39 @@ void selectMainMenu() {
                 break;
             case '5':
                 exitTheSystem();
+                break;
+            case 'w':
+                if (x != 1) x--;
+                break;
+            case 's':
+                if (x != 3) x++;
+                break;
+            case 'a':
+                if (y != 1) y--;
+                break;
+            case 'd':
+                if (x != 3 and y != 2) y++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        if (currentUsername == "admin") selUserMenuWithAdmin();
+                        else selectUserMenu();
+                        break;
+                    case 2:
+                        if (currentUsername == "admin") selGoodMenuWithAdmin();
+                        else selectGoodMenu();
+                        break;
+                    case 3:
+                        if (currentUsername == "admin") selectRecordMenu();
+                        else displayRecords();
+                        break;
+                    case 4:
+                        systemIntroduction();
+                        break;
+                    case 5:
+                        exitTheSystem();
+                }
                 break;
             default:
                 outputWarning("输入有误，请检查输入是否是[1~5]之间的整数！");
