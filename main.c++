@@ -20,7 +20,7 @@ int Good::maxDescribeCount;
 int Good::maxNameCount;
 int Good::maxCategoryCount;
 
-
+string uploaderItem="上传用户";
 bool loginStatus = false;                                      //登录状态
 string currentUsername;                                        //当前用户名
 vector<Record> records;                                        //交易记录
@@ -40,7 +40,7 @@ void inline pressAnyKey();
 
 template<typename T>
 T getInput(const string &prompt, int war = 0);                 //提示输入的同时获取用户输入，war表示是否需要警告
-string secureInput(string prompt = "");       //关闭输入回显的方式进行输入，默认提示为空
+string secureInput(string prompt = "",int isEncrypt=0);        //关闭输入回显的方式进行输入，默认提示为空
 
 
 /*用户管理*/
@@ -146,17 +146,20 @@ string getInput<string>(const string &prompt, int war) {
     return input;
 }
 
-string secureInput(const std::string prompt) {
+string secureInput(const std::string prompt,int isEncrypt) {
     std::cout << prompt;
     std::string input;
     char c;
     do {
         c = getch();
         if (c == '\r') {
-            for (int i = 1; i <= input.size(); i++) {
-                cout << "\b \b";
+            if(isEncrypt) {
+                for (int i = 1; i <= input.size(); i++) {
+                    cout << "\b \b";
+                }
+                cout << aes_encrypt(input)<<endl;
             }
-            cout << aes_encrypt(input) << "\n";
+            cout<<endl;
             break;
         }
         if (c == '\b' || c == 127) {
@@ -184,7 +187,7 @@ void selectUserMenu() {
         system("cls");
         switch (operation) {
             case '1':
-                login();
+                return;
                 break;
             case '2':
                 registerUser();
@@ -210,7 +213,7 @@ void selectUserMenu() {
                 switch (pos) {
                     case 1:
                         login();
-                        break;
+                        return;
                     case 2:
                         registerUser();
                         break;
@@ -266,7 +269,7 @@ void selUserMenuWithAdmin() {
         switch (operation) {
             case '1':
                 login();
-                break;
+                return;
             case '2':
                 registerUser();
                 break;
@@ -285,7 +288,7 @@ void selUserMenuWithAdmin() {
                 if (x != 1) x--;
                 break;
             case 's':
-                if (x != 2) x++;
+                if (x != 3) x++;
                 break;
             case 'a':
                 if (y != 1) y--;
@@ -297,7 +300,7 @@ void selUserMenuWithAdmin() {
                 switch (pos) {
                     case 1:
                         login();
-                        break;
+                        return;
                     case 2:
                         registerUser();
                         break;
@@ -396,7 +399,7 @@ void login() {
             password = secureInput(prompt);
             if (password == correctPassword) {
                 currentUsername = username;
-                outputHint("登录成功！");
+                outputHint("\n登录成功！");
                 if (currentUsername == "admin") {
                     outputHint("您已登录管理员账号，可以对公开拍品进行管理");
                 } else {
@@ -415,6 +418,8 @@ void login() {
         }
     }
     pressAnyKey();
+    if(currentUsername=="admin") selUserMenuWithAdmin();
+    else selectUserMenu();
 }
 
 void registerUser() {
@@ -424,8 +429,8 @@ void registerUser() {
         return registerUser();
     }
     inputAgain:
-    string password = getInput<string>(append("请输入密", 1) + "码：");
-    string password2 = getInput<string>(append("请确认密", 1) + "码：");
+    string password =  secureInput(append("请输入密", 1) + "码：");
+    string password2 = secureInput(append("请确认密", 1) + "码：");
     if (password2 == password) {
         User addUser(username, password);
         users[username] = addUser;
@@ -449,8 +454,8 @@ void modifyPassword() {
         outputWarning("密码错误，请重新输入！\n");
         goto inputAgain;
     }
-    string newpassword = getInput<string>("请输入新的密码：");
-    string newpassword2 = getInput<string>("请再次确认密码：");
+    string newpassword  = secureInput("请输入新的密码：");
+    string newpassword2 = secureInput("请再次确认密码：");
     if (newpassword2 == newpassword2) {
         users[currentUsername].password = newpassword;
         outputHint("修改成功！");
@@ -535,7 +540,7 @@ void selectGoodMenu() {
     char operation;
     int x = 1, y = 1;
     while (true) {
-        int pos = (x - 1) * y;
+        int pos = (x - 1)*2 + y;
         displayGoodMenu(pos);
         operation = _getch();
         system("cls");
@@ -780,6 +785,7 @@ void removeGood() {
         outputWarning("没有此编号的拍品，请重新输入！");
         removeGood();
     }
+    pressAnyKey();
 }
 
 void displayMyGoods(map<int, Good> needToDisplay) {
@@ -809,7 +815,7 @@ void displayMyGoods(map<int, Good> needToDisplay) {
     cout << left << setw(50) << transfer("描述", maxDescribeCount);
     cout << left << setw(30) << "估价（万元）";
     cout << left << setw(30) << transfer("种类", maxCategoryCount);
-    cout << left << setw(20) << "上传用户" << "|\n";
+    cout << left << setw(20) << uploaderItem << "|\n";
     cout << "|" << line << "|\n";
     int curId = 0;
     for (const auto &[goodId, good]: needToDisplay) {
@@ -973,6 +979,7 @@ void getGoodByName(map<int, Good> goods) {
 }
 
 void findGood() {
+    uploaderItem="持有用户";
     map<int, Good> goods = tables[currentUsername];
     string line;
     for (int i = 1; i <= 20 - 6; i++) line += "-";
@@ -989,18 +996,20 @@ void findGood() {
         cout << "|" << put(append("按名称查找", 1), 2, 20) << "|\n";
         cout << "|" << put(append("按类别查找", 1), 3, 20) << "|\n";
         cout << "|" << put("查看所有拍品", 4, 20) << "|\n";
+        cout << "|" << put(append("返回",4), 5, 20) << "|\n";
         cout << line << "--\n";
     };
     while (1) {
         dis();
         char c = _getch();
-        system("cls");
         switch (c) {
             case 'w':
                 if (pos != 1) pos--;
+                system("cls");
                 break;
             case 's':
-                if (pos != 4) pos++;
+                if (pos != 5) pos++;
+                system("cls");
                 break;
             case '\r':
                 switch (pos) {
@@ -1018,14 +1027,17 @@ void findGood() {
                         displayMyGoods(goods);
                         pressAnyKey();
                         break;
+                    case 5:
+                        system("cls");
+                        goto out;
                 }
-                goto out;
         }
     }
     out:;
 }
 
 void findOpenGood() {
+    uploaderItem="上传用户";
     map<int, Good> goods = tables["admin"];
     string line;
     for (int i = 1; i <= 20 - 6; i++) line += "-";
@@ -1042,18 +1054,20 @@ void findOpenGood() {
         cout << "|" << put(append("按名称查找", 1), 2, 20) << "|\n";
         cout << "|" << put(append("按类别查找", 1), 3, 20) << "|\n";
         cout << "|" << put("查看所有拍品", 4, 20) << "|\n";
+        cout << "|" << put(append("返回",4), 5, 20) << "|\n";
         cout << line << "--\n";
     };
     while (1) {
         dis();
         char c = _getch();
-        system("cls");
         switch (c) {
             case 'w':
                 if (pos != 1) pos--;
+                system("cls");
                 break;
             case 's':
-                if (pos != 4) pos++;
+                if (pos != 5) pos++;
+                system("cls");
                 break;
             case '\r':
                 switch (pos) {
@@ -1071,8 +1085,10 @@ void findOpenGood() {
                         displayMyGoods(goods);
                         pressAnyKey();
                         break;
+                    case 5:
+                        system("cls");
+                        goto out;
                 }
-                goto out;
         }
     }
     out:;
@@ -1152,6 +1168,7 @@ void batchAddGood() {
     }
     inputfile.close();
     outputHint("批量导入成功！");
+    pressAnyKey();
 }
 
 
@@ -1178,7 +1195,8 @@ void selectRecordMenu() {
                 if (x != 1) x--;
                 break;
             case 's':
-                if (x != 2) x++;
+                if ((x==1 and y==2) or x==2);
+                else x++;
                 break;
             case 'a':
                 if (y != 1) y--;
@@ -1266,7 +1284,7 @@ void englandAuction(Good curGood) {
             double curNeed = prePrice + minIncrement;
             cout << setw(10) << username;
             string hint = "［当前最低出价为 " + double2str(curNeed, 4)
-                          + "(万元)" + (curNeed > apprisal ? "  \033[33m已超出估价\033[0m" : "") + "］：";
+                          + "(万元)" + (curNeed > apprisal ? "  \033[33m已超出估价\033[0m" : "") + "]:";
             string price = getInput<string>(hint);
             if (price.empty()) {
                 abandonUsers.insert(username);
@@ -1323,7 +1341,8 @@ void sealedBiddingAuction(Good curGood) {
         double P_win = predictionSuccessRate(username);
         cout << "当前由" << username << "用户递交竞价，回车可放弃竞买！\n";
         cout << "系统预测当前竞买成功率为：" << "\033[33m" << double2str(P_win, 4) << "\033[0m";
-        string price = secureInput("\n如果你想成功竞拍，请斟酌您的递价（万元）：");
+        //只有这里需要加密
+        string price = secureInput("\n如果你想成功竞拍，请斟酌您的递价（万元）：",1);
         cout << "\n";
         if (!price.empty()) {
             bidPrice[username] = stod(price);
@@ -1359,7 +1378,7 @@ void sealedBiddingAuction(Good curGood) {
     cout << line << "--\n";
 
     //记录交易结果
-    string selId = getInput<string>("拍卖人最终选择的竞买人的编号：");
+    string selId = getInput<string>("拍卖人最终选择的竞买人的编号，回车表示放弃竞买！");
     string username = id2user[selId];
     if (selId.empty()) {
         outputWarning("拍卖人没有选择竞买人，竞买失败！");
@@ -1614,14 +1633,14 @@ void saveRecords() {
 /*-------------------------------------------------首页----------------------------------------------------*/
 void displayMainMenu(int pos) {
     //@formatter:off
-    cout<<"                              ,,                                            \n";
-    cout<<" `7MMF'     A     `7MF'     `7MM                                            \n";
-    cout<<"   `MA     ,MA     ,V         MM                                            \n";
-    cout<<"    VM:   ,VVM:   ,V .gP\"Ya   MM  ,p6\"bo   ,pW`Wq.`7MMpMMMb.pMMMb.  .gP\"Ya  \n";
-    cout<<"     MM.  M' MM.  M',M'   Yb  MM 6M'  OO  6W'   `Wb MM    MM    MM ,M'   Yb \n";
-    cout<<"     `MM A'  `MM A' 8M\"\"\"\"\"\"  MM 8M       8M     M8 MM    MM    MM 8M\"\"\"\"\"\" \n";
-    cout<<"      :MM;    :MM;  YM.    ,  MM YM.    , YA.   ,A9 MM    MM    MM YM.    , \n";
-    cout<<"       VF      VF    `Mbmmd'.JMML.YMbmd'   `Ybmd9'.JMML  JMML  JMML.`Mbmmd' \n";
+    cout<<"                             ,,                                            \n";
+    cout<<"`7MMF'     A     `7MF'     `7MM                                            \n";
+    cout<<"  `MA     ,MA     ,V         MM                                            \n";
+    cout<<"   VM:   ,VVM:   ,V .gP\"Ya   MM  ,p6\"bo   ,pW`Wq.`7MMpMMMb.pMMMb.  .gP\"Ya  \n";
+    cout<<"    MM.  M' MM.  M',M'   Yb  MM 6M'  OO  6W'   `Wb MM    MM    MM ,M'   Yb \n";
+    cout<<"    `MM A'  `MM A' 8M\"\"\"\"\"\"  MM 8M       8M     M8 MM    MM    MM 8M\"\"\"\"\"\" \n";
+    cout<<"     :MM;    :MM;  YM.    ,  MM YM.    , YA.   ,A9 MM    MM    MM YM.    , \n";
+    cout<<"      VF      VF    `Mbmmd'.JMML.YMbmd'   `Ybmd9'.JMML  JMML  JMML.`Mbmmd' \n";
 
 
 
@@ -1729,7 +1748,8 @@ void selectMainMenu() {
                 if (x != 1) x--;
                 break;
             case 's':
-                if (x != 3) x++;
+                if ((x==2 and y==2) or x == 3);
+                else x++;
                 break;
             case 'a':
                 if (y != 1) y--;
