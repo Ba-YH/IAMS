@@ -972,63 +972,110 @@ void getGoodByName(map<int, Good> goods) {
     pressAnyKey();
 }
 
-void findGood() {
+void findOpen() {
     map<int, Good> goods = tables[currentUsername];
-    findAgain:
-    cout << "请选择查找类型[1~4之间的整数]：\n";
-    cout << "  1. 按编号查找\n" << "  2. 按名称查找\n" << "  3. 按类别查找\n" << "  4. 查看所有物品\n";
-    int selId = 0;
-    cin >> selId;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    switch (selId) {
-        case 1:
-            getGoodById(goods);
-            break;
-        case 2:
-            getGoodByName(goods);
-            break;
-        case 3:
-            getGoodByCategory(goods);
-            break;
-        case 4:
-            outputHint("\n所有物品的信息如下：");
-            displayMyGoods(goods);
-            pressAnyKey();
-            break;
-        default:
-            outputWarning("输入有误，检查输入是否为[1,4]之间的整数！\n");
-            goto findAgain;
+    string line;
+    for (int i = 1; i <= 20 - 6; i++) line += "-";
+    int pos=1;
+    auto put = [&](string value, int id, int width) -> string {
+        ostringstream os;
+        if (id == pos) os << "\033[33m" << left << setw(width) << value << "\033[0m";
+        else os << left << setw(width) << value;
+        return os.str();
+    };
+    auto dis = [&]() -> void {
+        cout << line << "--\n";
+        cout << "|" << put(append("按编号查找",1), 1, 20) << "|\n";
+        cout << "|" << put(append("按名称查找",1), 2, 20) << "|\n";
+        cout << "|" << put(append("按类别查找",1), 3, 20) << "|\n";
+        cout << "|" << put("查看所有拍品", 4, 20) << "|\n";
+        cout << line << "--\n";
+    };
+    while (1) {
+        dis();
+        char c = _getch();
+        system("cls");
+        switch (c) {
+            case 'w':
+                if (pos != 1) pos--;
+                break;
+            case 's':
+                if (pos != 4) pos++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        getGoodById(goods);
+                        break;
+                    case 2:
+                        getGoodByName(goods);
+                        break;
+                    case 3:
+                        getGoodByCategory(goods);
+                        break;
+                    case 4:
+                        outputHint("\n所有拍品的信息如下：");
+                        displayMyGoods(goods);
+                        pressAnyKey();
+                        break;
+                }
+                goto out;
+        }
     }
+    out:;
 }
 
 void findOpenGood() {
     map<int, Good> goods = tables["admin"];
-
-    findAgain:
-    cout << "请选择查找类型[1~4之间的整数]\n";
-    cout << "  1. 按编号查找\n" << "  2. 按名称查找\n" << "  3. 按类别查找\n" << "  4. 查看所有拍品\n";
-    int selId = 0;
-    cin >> selId;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    switch (selId) {
-        case 1:
-            getGoodById(goods);
-            break;
-        case 2:
-            getGoodByName(goods);
-            break;
-        case 3:
-            getGoodByCategory(goods);
-            break;
-        case 4:
-            outputHint("\n所有拍品的信息如下：");
-            displayMyGoods(goods);
-            pressAnyKey();
-            break;
-        default:
-            outputWarning("输入有误，检查输入是否为[1,4]之间的整数！");
-            goto findAgain;
+    string line;
+    for (int i = 1; i <= 20 - 6; i++) line += "-";
+    int pos=1;
+    auto put = [&](string value, int id, int width) -> string {
+        ostringstream os;
+        if (id == pos) os << "\033[33m" << left << setw(width) << value << "\033[0m";
+        else os << left << setw(width) << value;
+        return os.str();
+    };
+    auto dis = [&]() -> void {
+        cout << line << "--\n";
+        cout << "|" << put(append("按编号查找",1), 1, 20) << "|\n";
+        cout << "|" << put(append("按名称查找",1), 2, 20) << "|\n";
+        cout << "|" << put(append("按类别查找",1), 3, 20) << "|\n";
+        cout << "|" << put("查看所有拍品", 4, 20) << "|\n";
+        cout << line << "--\n";
+    };
+    while (1) {
+        dis();
+        char c = _getch();
+        system("cls");
+        switch (c) {
+            case 'w':
+                if (pos != 1) pos--;
+                break;
+            case 's':
+                if (pos != 4) pos++;
+                break;
+            case '\r':
+                switch (pos) {
+                    case 1:
+                        getGoodById(goods);
+                        break;
+                    case 2:
+                        getGoodByName(goods);
+                        break;
+                    case 3:
+                        getGoodByCategory(goods);
+                        break;
+                    case 4:
+                        outputHint("\n所有拍品的信息如下：");
+                        displayMyGoods(goods);
+                        pressAnyKey();
+                        break;
+                }
+                goto out;
+        }
     }
+    out:;
 }
 
 void uploadGood() {
