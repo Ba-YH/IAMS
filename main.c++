@@ -224,8 +224,6 @@ void selectUserMenu() {
                         return;
                 }
                 break;
-            default:
-                outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
         }
         //saveGoods();
     }
@@ -317,8 +315,6 @@ void selUserMenuWithAdmin() {
                         return;
                 }
                 break;
-            default:
-                outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
         }
         //saveGoods();
     }
@@ -607,8 +603,6 @@ void selectGoodMenu() {
                         return;
                 }
                 break;
-            default:
-                outputWarning("输入错误，请检查输入是否是[1~8]之间的整数！\n");
         }
         //saveGoods();
     }
@@ -691,8 +685,6 @@ void selGoodMenuWithAdmin() {
                         return;
                 }
                 break;
-            default:
-                outputWarning("输入错误，请检查输入是否是[1~4]之间的整数！\n");
         }
         //saveGoods();
     }
@@ -746,6 +738,7 @@ void userAddGood(string username, Good g) {
 }
 
 void addGood() {
+    outputWarning("添加物品必须合法合规，否则经管理员审查后给与封号处理\n\n");
     string goodName = getInput<string>("请输入物品名称：");
     double degreeOfImpairment = getInput<double>("请输入物品磨损程度(0~1之间的两位小数(会自动取舍)：");
     string describe = getInput<string>("请输入物品描述(注意详略得当)：");
@@ -1216,8 +1209,6 @@ void selectRecordMenu() {
                         return;
                 }
                 break;
-            default:
-                outputWarning("输入错误，请重新输入！\n");
         }
         //saveRecords();
     }
@@ -1778,8 +1769,6 @@ void selectMainMenu() {
                         exitTheSystem();
                 }
                 break;
-            default:
-                outputWarning("输入有误，请检查输入是否是[1~5]之间的整数！");
         }
     }
 }
