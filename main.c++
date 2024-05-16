@@ -35,9 +35,8 @@ string recordsfilename = "../data/records.json";               //日志保存位
 /*------------------------------------------------函数声明区--------------------------------------------------*/
 /*辅助功能函数*/
 void inline loginOrNot();                                      //判断是否登录
-void inline misjudgment(string operationDescribe);             //误触判断
-void inline pressAnyKey();
-
+void inline pressAnyKey();                                     //任意键继续
+void inline contentHint(const string& content);                //提示当前页面
 template<typename T>
 T getInput(const string &prompt, int war = 0);                 //提示输入的同时获取用户输入，war表示是否需要警告
 string secureInput(string prompt = "",int isEncrypt=0);        //关闭输入回显的方式进行输入，默认提示为空
@@ -124,6 +123,10 @@ void inline pressAnyKey() {
     char ch = _getch();
     system("cls");
     return;
+}
+
+void inline contentHint(const string& content){
+    outputHint("当前是"+content+"页面\n\n\n");
 }
 
 template<typename T>
@@ -349,6 +352,7 @@ void disUserMenuWithAdmin(int pos) {
 }
 
 void login() {
+    contentHint("用户登录");
     //判断是否需要切换账号
     string username, password;
     if (loginStatus) {
@@ -419,6 +423,7 @@ void login() {
 }
 
 void registerUser() {
+    contentHint("用户注册");
     string username = getInput<string>("请输入用户名：");
     if (username == "admin" || users.count(username)) {
         outputWarning("该用户名已存在，请重新输入！\n");
@@ -439,6 +444,7 @@ void registerUser() {
 }
 
 void modifyPassword() {
+    contentHint("修改密码");
     if (loginStatus == false) {
         outputWarning("您还没有登录！\n");
         pressAnyKey();
@@ -486,6 +492,7 @@ void usersList() {
 }
 
 void banningUser() {
+    contentHint("封禁用户");
     string shortline;
     for (int i = 1; i <= 90 - 11; i++) shortline += '-';
     int uid = 0;
@@ -738,6 +745,7 @@ void userAddGood(string username, Good g) {
 }
 
 void addGood() {
+    contentHint("添加物品");
     outputWarning("添加物品必须合法合规，否则经管理员审查后给与封号处理\n\n");
     string goodName = getInput<string>("请输入物品名称：");
     double degreeOfImpairment = getInput<double>("请输入物品磨损程度(0~1之间的两位小数(会自动取舍)：");
@@ -765,6 +773,7 @@ void addGood() {
 }
 
 void removeGood() {
+    contentHint("下架物品");
     map<int, Good> goods = tables["admin"];
     cout << "\n\n当前所有拍品的信息如下：\n";
     displayMyGoods(goods);
@@ -821,6 +830,7 @@ void displayMyGoods(map<int, Good> needToDisplay) {
 }
 
 void deleteGood() {
+    contentHint("删除物品");
     map<int, Good> currentGoods = tables[currentUsername];
     //判断是否有物品
     if (currentGoods.size() == 0) {
@@ -853,6 +863,7 @@ void deleteGood() {
 }
 
 void modifyGood() {
+    contentHint("修改物品");
     map<int, Good> currentGoods = tables[currentUsername];
 
     //检查是否有物品
@@ -1130,6 +1141,7 @@ void uploadGood() {
 
 
 void batchAddGood() {
+    contentHint("批量添加物品");
     inputAgain:
     string fileName = getInput<string>("请输入文件路径，注意只能是JSON格式文件：");
     size_t dotPos = fileName.find_last_of(".");
@@ -1241,6 +1253,7 @@ void displayRecordMenu(int pos) {
 }
 
 void englandAuction(Good curGood) {
+    contentHint("英式拍卖");
     srand(time(0));
     double startingPrice = getInput<double>("\n\n请设置起拍价（万元）：");
     double minIncrement = getInput<double>("请设置最小加价幅度（万元）：");
@@ -1308,6 +1321,7 @@ void englandAuction(Good curGood) {
 }
 
 void sealedBiddingAuction(Good curGood) {
+    contentHint("招标式拍卖");
     outputHighlight("\n竞买人将出价加密发送给拍卖人\n");
     map<string, int> bidPrice;
     string uploader = curGood.getUploader();
@@ -1382,6 +1396,7 @@ void sealedBiddingAuction(Good curGood) {
 }
 
 void auction() {
+    contentHint("选择拍品");
     //选择拍品->选择拍卖方式->拍卖->记录结果
     map<int, Good> openGoods = tables["admin"];
     cout << "\n\n所有拍品的信息如下：\n";
@@ -1389,6 +1404,9 @@ void auction() {
     int selId = getInput<int>("选择要竞拍的拍品编号：");
     Good currentItem = openGoods[selId];
     toString(currentItem);
+    outputHint("\n\n按任意键继续...");
+    char ch=_getch();
+    system("cls");
 
     string line;
     for (int i = 1; i <= 20 - 6; i++) line += "-";
@@ -1399,7 +1417,8 @@ void auction() {
         else os << left << setw(width) << value;
         return os.str();
     };
-    auto dis = [&]() -> void {
+    auto dis = [&]() -> void{
+        contentHint("选择拍卖方式");
         cout << line << "--\n";
         cout << "|" << put(append("英格兰式拍卖", 1), 1, 20) << "|\n";
         cout << "|" << put("密封招标式拍卖", 2, 20) << "|\n";
