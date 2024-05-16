@@ -27,7 +27,7 @@ int countChineseCharacters(const std::string& text) {
     return (text.size()-utf8len(text))/2;
 }
 void inline outputWarning(const std::string &warning) {
-    std::cout << "\033[31m" << warning << "\033[0m";
+    std::cout <<"❗"<< "\033[31m" << warning << "\033[0m";
 }
 void inline outputHint(const std::string &hint) {
     std::cout << "\033[32m" << hint << "\033[0m"<<std::endl;
