@@ -1516,7 +1516,7 @@ void displayRecords() {
     double totalPrice = 0;
     string line, shortline;
     int tranNumber = 0;
-    for (int i = 1; i <= 132; i++) line += '-';
+    for (int i = 1; i <= 132+30-8; i++) line += '-';
     for (int i = 1; i <= 61; i++) shortline += '-';
     map<string, int> cnt;
     for (const auto &[username, id]: users) {
@@ -1532,13 +1532,14 @@ void displayRecords() {
     cout << line << "--\n|";
     cout << left << setw(20) << "交易单号" << left << setw(40) << "交易时间";
     cout << left << setw(30) << "中拍者" << left << setw(30) << "成交价";
-    cout << left << setw(30) << "拍品编号" << "|\n";
+    cout << left << setw(30) << "拍品编号"<< left << setw(30) << transfer("拍品种类",8)<<"|\n";
     cout << "|" << line << "|" << endl;
     for (const auto &record: records) {
         cout << "|";
         std::ostringstream oss;
         oss << left << setw(20) << append(int2str(++tranNumber, 6), 4);
         oss << record;
+        oss << left << setw(30) << transfer(tables[record.getShooterName()][record.getGoodId()].getCategory(),8);
         //高亮显示自己的交易记录
         if (record.getShooterName() == currentUsername) {
             outputHighlight(oss.str());
