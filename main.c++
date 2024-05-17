@@ -494,7 +494,7 @@ void modifyPassword() {
 }
 
 void usersList() {
-    outputHint("\n所有用户信息如下：");
+    contentHint("用户信息展示");
     string line;
     for (int i = 1; i <= 100 - 17; i++) line += '-';
     cout << line << "--\n";
@@ -513,6 +513,18 @@ void usersList() {
         cout << "|\n";
     }
     cout << line << "--\n\n\n";
+    cout<<"\n\n所有用户物品一览表:\n";
+    for(auto [username,user]: users){
+        if(username=="admin") continue;
+        uploaderItem="持有用户";
+        cout<<"\n\n用户"<<username<<"的所有物品如下：\n";
+        map<int,Good> need2dis=tables[username];
+        if(need2dis.size()==0){
+            cout<<"目前还没有物品！\n\n";
+        }else {
+            displayMyGoods(tables[username]);
+        }
+    }
     pressAnyKey();
 }
 
@@ -821,13 +833,13 @@ void displayMyGoods(map<int, Good> needToDisplay) {
         pressAnyKey();
         return;
     }
-    auto maxNameCount = 3;
-    auto maxDescribeCount = 2;
-    auto maxCategoryCount = 2;
+    auto maxNameCount = 7;
+    auto maxDescribeCount = 16;
+    auto maxCategoryCount = 8;
     for (const auto &[goodId, good]: needToDisplay) {
         maxNameCount = max(maxNameCount, countChineseCharacters(good.getGoodName()));
         maxDescribeCount = max(maxDescribeCount, countChineseCharacters(good.getDescribe()));
-        maxCategoryCount = max(maxCategoryCount, countChineseCharacters(good.getCategory()));
+        //maxCategoryCount = max(maxCategoryCount, countChineseCharacters(good.getCategory()));
     }
     Good::maxCategoryCount = maxCategoryCount;
     Good::maxNameCount = maxNameCount;
@@ -1124,6 +1136,7 @@ void findOpenGood() {
 }
 
 void uploadGood() {
+    contentHint("上传物品");
     map<int, Good> currentGoods = tables[currentUsername];
     //判断是否有物品
     if (currentGoods.size() == 0) {
@@ -1154,14 +1167,7 @@ void uploadGood() {
         goto inputAgain;
     }
 
-    while (true) {
-        string continueOrNot = getInput<string>("是否需要继续上传物品？(y/n)");
-        if (continueOrNot == "y" || continueOrNot.empty()) {
-            goto uploadAgain;
-        } else {
-            break;
-        }
-    }
+    pressAnyKey();
 }
 
 
@@ -1351,15 +1357,18 @@ void sealedBiddingAuction(Good curGood) {
     map<string, int> bidPrice;
     string uploader = curGood.getUploader();
     string category = curGood.getCategory();
-
+    vector<string> participants;
+    for(auto [username,user] : users){
+        if(username=="admin" || username==uploader || user.isAvailable==false) continue;
+        participants.push_back(username);
+    }
     //预测拍卖成功率
     auto predictionSuccessRate = [&](string curUsername) -> double {
-        int effectiveNumber = 0;
+        int effectiveNumber = participants.size();
         double P_other_fails = 1.0;
-        for (auto [otherUsername, otherUser]: users) {
-            if (otherUsername == "admin" || otherUsername == uploader) continue;
-            effectiveNumber++;
-            P_other_fails *= (1 - otherUser.difCategorySucessRate[category]);
+        for (auto otherUsername : participants) {
+            if(otherUsername==curUsername) continue;
+            P_other_fails *= (1 - users[otherUsername].difCategorySucessRate[category]);
         }
         double lambda = 1.0 / effectiveNumber;
         double P_win = lambda * P_other_fails + (1 - lambda) * users[curUsername].difCategorySucessRate[category];
@@ -1486,13 +1495,16 @@ void transaction(string uploader, string shootername, Good g, double price) {
     g.setUploader(shootername);
     userAddGood(shootername, g);
     //更新用户信息
-    int cnt1 = users[shootername].countOfSessions;
-    int cnt = users[shootername].sucessRate * cnt1;
     string category = g.getCategory();
+    User u=users[shootername];
+    u.difCategoryCnt[category]++;
+    int cnt1 = u.countOfSessions,c=0;
+    for(auto t: categories){
+        c+=u.difCategoryCnt[t];
+    }
     //更新成功率，各类型拍品成功次数和成功率
-    users[shootername].sucessRate = (cnt + 1.0) / cnt1;
-    users[shootername].difCategoryCnt[category]++;
-    users[shootername].difCategorySucessRate[category] = users[shootername].difCategoryCnt[category] / cnt1;
+    u.sucessRate = 1.0*c / cnt1;
+    u.difCategorySucessRate[category] = u.difCategoryCnt[category] / cnt1;
     //交易记录
     Record record(g.getId(), price, shootername);
     records.push_back(record);
