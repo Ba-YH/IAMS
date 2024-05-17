@@ -1550,11 +1550,14 @@ void displayRecords() {
         cnt[record.getShooterName()]++;
         totalPrice += record.getFinalPrice();
     }
-    cout << line << "--\n\n";
+    cout << line << "--\n\n\n";
     next:
-    //统计交易信息
+    outputHint("\n\n按任意键继续查看统计信息");
+    char ch=_getch();
+    system("cls");
+    contentHint("统计信息");
     cout << "竞拍物品数量：" << records.size() << endl;
-    cout << "交易总额：" << totalPrice << endl;
+    cout << "交易总额：" << totalPrice <<" 万元"<< endl;
 
     //统计排名
     vector<pair<string, int>> shootCnt(cnt.begin(), cnt.end());
