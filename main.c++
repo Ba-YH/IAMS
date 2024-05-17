@@ -1,6 +1,7 @@
 #include "conio.h"
-#include <locale>
-#include <codecvt>
+#include "locale"
+#include "codecvt"
+#include "windows.h"
 #include "src/Good.c++"
 #include "src/User.c++"
 #include "src/Record.c++"
@@ -10,7 +11,6 @@
 
 using namespace std;
 using json = nlohmann::json;
-
 
 
 /*----------------------------------------------数据定义区----------------------------------------------------*/
@@ -31,7 +31,7 @@ hash<string> hasher;                                           //哈希函数
 string goodsfilename = "../data/goods.json";                   //拍卖品数据文件位置
 string usersfilename = "../data/users.json";                   //用户数据文件位置
 string recordsfilename = "../data/records.json";               //日志保存位置
-
+string buttonColor="31";
 /*------------------------------------------------函数声明区--------------------------------------------------*/
 /*辅助功能函数*/
 void inline loginOrNot();                                      //判断是否登录
@@ -126,7 +126,32 @@ void inline pressAnyKey() {
 }
 
 void inline contentHint(const string& content){
-    outputHint("当前是"+content+"页面\n\n\n");
+    //当文本显示在正中间
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    int consoleWidth;
+
+    // 获取控制台屏幕缓冲区信息
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+
+    // 计算文本的起始位置
+    std::string text = "当前为"+content+"页面";
+    int textWidth = text.length();
+    int xPosition = (consoleWidth - textWidth) / 2; // 控制台宽度的一半减去文本长度的一半
+
+    // 设置光标位置到屏幕最顶行的中间
+    COORD coord;
+    coord.X = xPosition;
+    coord.Y = 0; // 第一行
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+
+    // 输出文本
+    outputHint(text);
+
+    // 恢复光标位置
+    coord.X = 0;
+    coord.Y = 3;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
 template<typename T>
@@ -248,7 +273,7 @@ void displayUserMenu(int pos) {
     cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
     auto put=[&](string value,int id,int width)->string{
         ostringstream os;
-        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        if(id==pos) os<<"\033["<<buttonColor<<"m"<<setw(30)<<value<<"\033[0m";
         else  os<<setw(30)<<value;
         return os.str();
     };
@@ -339,7 +364,7 @@ void disUserMenuWithAdmin(int pos) {
     cout<<"|"<<right<<setw(80)<<append("",8)<<"|\n";
     auto put=[&](string value,int id,int width)->string{
         ostringstream os;
-        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        if(id==pos) os<<"\033["<<buttonColor<<"m"<<setw(30)<<value<<"\033[0m";
         else  os<<setw(30)<<value;
         return os.str();
     };
@@ -631,7 +656,7 @@ void displayGoodMenu(int pos) {
     }
     auto put=[&](string value,int id,int width)->string{
         ostringstream os;
-        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        if(id==pos) os<<"\033["<<buttonColor<<"m"<<setw(30)<<value<<"\033[0m";
         else  os<<setw(30)<<value;
         return os.str();
     };
@@ -713,7 +738,7 @@ void disGoodMenuWithAdmin(int pos) {
     }
         auto put=[&](string value,int id,int width)->string{
         ostringstream os;
-        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        if(id==pos) os<<"\033["<<buttonColor<<"m"<<setw(30)<<value<<"\033[0m";
         else  os<<setw(30)<<value;
         return os.str();
     };
@@ -1241,7 +1266,7 @@ void displayRecordMenu(int pos) {
     }
     auto put=[&](string value,int id,int width)->string{
         ostringstream os;
-        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        if(id==pos) os<<"\033["<<buttonColor<<"m"<<setw(30)<<value<<"\033[0m";
         else  os<<setw(30)<<value;
         return os.str();
     };
@@ -1668,7 +1693,7 @@ void displayMainMenu(int pos) {
     string recordsValue=currentUsername=="admin"?"3. 交易管理":"3. 交易记录";
     auto put=[&](string value,int id,int width)->string{
         ostringstream os;
-        if(id==pos) os<<"\033[33m"<<setw(30)<<value<<"\033[0m";
+        if(id==pos) os<<"\033["<<buttonColor<<"m"<<setw(30)<<value<<"\033[0m";
         else  os<<setw(30)<<value;
         return os.str();
     };
