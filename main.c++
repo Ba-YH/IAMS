@@ -1482,6 +1482,16 @@ void auction() {
         }
     }
     out:;
+    //更新用户信息
+    for(auto [username,user] : users){
+        int cnt=user.countOfSessions;
+        int get=0;
+        for(auto category : categories){
+            get+=user.difCategoryCnt[category];
+            user.difCategorySucessRate[category]=1.0*user.difCategoryCnt[category]/cnt;
+        }
+        user.sucessRate=get/cnt;
+    }
 }
 
 void transaction(string uploader, string shootername, Good g, double price) {
@@ -1494,17 +1504,7 @@ void transaction(string uploader, string shootername, Good g, double price) {
     g.setAppraisal(price * 0.9);
     g.setUploader(shootername);
     userAddGood(shootername, g);
-    //更新用户信息
-    string category = g.getCategory();
-    User u=users[shootername];
-    u.difCategoryCnt[category]++;
-    int cnt1 = u.countOfSessions,c=0;
-    for(auto t: categories){
-        c+=u.difCategoryCnt[t];
-    }
-    //更新成功率，各类型拍品成功次数和成功率
-    u.sucessRate = 1.0*c / cnt1;
-    u.difCategorySucessRate[category] = u.difCategoryCnt[category] / cnt1;
+    users[shootername].difCategoryCnt[g.getCategory()]++;
     //交易记录
     Record record(g.getId(), price, shootername);
     records.push_back(record);
@@ -1637,7 +1637,10 @@ void loadData() {
     recordsFile >> j;
     if (!j.empty()) {
         for (auto &record: j) {
-            records.push_back(record.get<Record>());
+            Record record1=record.get<Record>();
+            string name=record1.getShooterName();
+            maxGoodId[name]=max(maxGoodId[name],record1.getGoodId());
+            records.push_back(record1);
         }
         recordsFile.close();
     }
